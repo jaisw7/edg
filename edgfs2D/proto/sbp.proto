@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+message Matrix {
+  repeated double values = 1;
+}
+
+message SBP {
+    // degree of approximation
+    int32 degree = 1;
+
+    // number of nodes
+    int32 numnodes = 2;
+
+    // vertices of reference element
+    repeated double vtx = 3;
+
+    // cubature weights
+    repeated double cw = 4;
+
+    // discrete stiffness matrix operator
+    repeated Matrix Q = 5;
+
+    // discrete edge operator
+    repeated Matrix E = 6;
+
+    // quadrature nodes
+    repeated double qz = 7;
+
+    // quadrature weights
+    repeated double qw = 8;
+
+    // surface quadrature nodes
+    repeated double sqz = 9;
+
+    // surface quadrature nodes
+    repeated double sqw = 10;
+}

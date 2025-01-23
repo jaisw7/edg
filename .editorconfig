@@ -1,0 +1,16 @@
+# .editorconfig file
+root = true
+
+[*.py]
+indent_style = space
+indent_size = 4
+max_line_length = 80
+quote_type = double
+trim_trailing_whitespace = true
+end_of_line = lf
+
+# Isort configuration
+[tool.isort]
+profile = black
+skip =
+    proto/
