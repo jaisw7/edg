@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 
 import numpy as np
 
@@ -6,17 +6,18 @@ import numpy as np
 class BaseQuadrature(object, metaclass=ABCMeta):
     kind = None
 
+    @abstractmethod
     def __init__(self, cfg, name, *args, **kwargs):
         self.cfg = cfg
 
-    @property
+    @abstractproperty
     def Nq(self):
-        return self._Nq
+        pass
 
-    @property
+    @abstractproperty
     def z(self):
-        return self._z
+        pass
 
-    @property
+    @abstractproperty
     def w(self):
-        return self._w
+        pass

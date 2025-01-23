@@ -38,6 +38,15 @@ class DgField(object, metaclass=ABCMeta):
             for shape, d in data.items()
         }
 
+    def _to_device_interfaces(self, data: FieldData):
+        return {
+            shape: (
+                torch.from_numpy(fid).to(device=self.cfg.device),
+                torch.from_numpy(eid).to(device=self.cfg.device),
+            )
+            for shape, (fid, eid) in data.items()
+        }
+
     def _apply_initial_condition(self, u: FieldData, ic: BaseInitialCondition):
         for shape, x in self.dgmesh.get_element_nodes.items():
             u[shape].copy_(torch.from_numpy(ic.apply(x)))
@@ -49,6 +58,13 @@ class DgField(object, metaclass=ABCMeta):
     @cached_property
     def _element_nodes(self):
         return self._to_device(self.dgmesh.get_element_nodes)
+
+    @cached_property
+    def _internal_interfaces(self):
+        return (
+            self._to_device_interfaces(self.dgmesh.get_internal_interfaces[0]),
+            self._to_device_interfaces(self.dgmesh.get_internal_interfaces[1]),
+        )
 
     @cached_property
     def _internal_interface_normals(self):
@@ -64,6 +80,24 @@ class DgField(object, metaclass=ABCMeta):
                 self.dgmesh.get_internal_interface_scaled_jacobian_det[0]
             ),
             None,
+        )
+
+    @cached_property
+    def _boundary_interfaces(self):
+        return self._to_device_interfaces(self.dgmesh.get_boundary_interfaces)
+
+    @cached_property
+    def _boundary_interface_nodes(self):
+        return self._to_device(self.dgmesh.get_boundary_interface_nodes)
+
+    @cached_property
+    def _boundary_interface_normals(self):
+        return self._to_device(self.dgmesh.get_boundary_interface_normals)
+
+    @cached_property
+    def _boundary_interface_scaled_jacobian_det(self):
+        return self._to_device(
+            self.dgmesh.get_boundary_interface_scaled_jacobian_det
         )
 
     def create_new_field(self) -> FieldData:
@@ -92,7 +126,7 @@ class DgField(object, metaclass=ABCMeta):
         ), "Only one type of element supported as of now"
         return next(iter(self.dgmesh.get_basis_at_shapes.keys()))
 
-    def traces(self, uf: FieldData) -> FieldDataTuple:
+    def _internal_traces(self, uf: FieldData) -> FieldDataTuple:
         shape = self._get_shape
         trace_lhs, trace_rhs = FieldData(), FieldData()
         lhs, rhs = self.dgmesh.get_internal_interfaces
@@ -102,21 +136,29 @@ class DgField(object, metaclass=ABCMeta):
             trace_rhs[key] = uf[shape][fids, eids, ...]
         return (trace_lhs, trace_rhs)
 
-    def _apply_boundary_condition(
-        self, uf: FieldData, bc: Dict[str, BaseBoundaryCondition]
-    ):
+    def _boundary_traces(
+        self,
+        curr_time: torch.float64,
+        uf: FieldData,
+        bc: Dict[str, BaseBoundaryCondition],
+    ) -> FieldDataTuple:
+        pe = lambda v: print(v[next(iter(v.keys()))].squeeze().numpy())
+        pex = lambda v: pe(v) + exit(0)
+
         shape = self._get_shape
-        trace_bnd = FieldData()
-        bnd = self.dgmesh.get_boundary_interface
-        for bid, (fids, eids) in bnd.items():
-            trace_bnd[bid] = bc[shape].apply(uf[shape][fids, eids, ...])
+        trace_lhs, trace_rhs = FieldData(), FieldData()
+        for key, (fids, eids) in self.dgmesh.get_boundary_interfaces.items():
+            trace_lhs[key] = uf[shape][fids, eids, ...]
+            trace_rhs[key] = bc[key].apply(
+                curr_time, trace_lhs[key], self._boundary_interface_nodes[key]
+            )
+        return (trace_lhs, trace_rhs)
 
-        return trace_bnd
-
-    def _compute_flux(self, ul: FieldData, ur: FieldData, flux: BaseFlux):
-        nl, _ = self._internal_interface_normals
-        for shape in ul.keys():
-            flux.apply(ul[shape], ur[shape], nl[shape])
+    def _compute_flux(
+        self, ul: FieldData, ur: FieldData, nl: FieldData, flux: BaseFlux
+    ):
+        for key in ul.keys():
+            flux.apply(ul[key], ur[key], nl[key])
 
     def _convect(self, gradu: FieldData, velocity: torch.Tensor) -> FieldData:
         data = FieldData()
@@ -124,66 +166,38 @@ class DgField(object, metaclass=ABCMeta):
             data[shape] = basis.convect(gradu[shape], velocity)
         return data
 
+    def _add_flux(self, uf, velocity, interface, nl, fl, sdetl):
+        shape = self._get_shape
+        for key, (fids, eids) in interface.items():
+            uf[shape][fids, eids, ...] = (
+                torch.tensordot(nl[key], velocity, dims=1).unsqueeze(-1)
+                * uf[shape][fids, eids, ...]
+                - fl[key]
+            ) * sdetl[key].unsqueeze(-1)
+
     def _lift_jump(
         self,
         fl: FieldData,
         fr: FieldData,
+        fb: FieldData,
         uf: FieldData,
         velocity: torch.Tensor,
         out: torch.Tensor,
     ) -> FieldData:
-        pe = lambda v: print(v[next(iter(v.keys()))].squeeze().numpy())
-        pex = lambda v: pe(v) + exit(0)
 
         shape = self._get_shape
-        lhs, rhs = self.dgmesh.get_internal_interfaces
+        lhs, rhs = self._internal_interfaces
         nl, nr = self._internal_interface_normals
         basis = self.dgmesh.get_basis_at_shapes[shape]
         sdetl, _ = self._internal_interface_scaled_jacobian_det
 
-        # print(torch.norm(fl[next(iter(fl.keys()))] + fr[next(iter(fr.keys()))]))
+        bnd = self._boundary_interfaces
+        xb = self._boundary_interface_nodes
+        nb = self._boundary_interface_normals
+        sdetb = self._boundary_interface_scaled_jacobian_det
 
-        # pe(fl)
-        # pe(fr)
-
-        # pe(nl)
-
-        for key, (fids, eids) in lhs.items():
-            # print(uf[shape][fids, eids, ...].squeeze().numpy())
-            # print(fl[key].squeeze().numpy())
-            # print(torch.tensordot(nl[key], velocity, dims=1).squeeze().numpy())
-            # print(
-            #     (
-            #         torch.tensordot(nl[key], velocity, dims=1).unsqueeze(-1)
-            #         * uf[shape][fids, eids, ...]
-            #     )
-            #     .squeeze()
-            #     .numpy()
-            # )
-            fl[key] = (
-                torch.tensordot(nl[key], velocity, dims=1).unsqueeze(-1)
-                * uf[shape][fids, eids, ...]
-                - fl[key]
-            )
-
-        for key, (fids, eids) in rhs.items():
-            # print(uf[shape][fids, eids, ...].squeeze().numpy())
-            # print(fr[key].squeeze().numpy())
-            fr[key] = (
-                torch.tensordot(nr[key], velocity, dims=1).unsqueeze(-1)
-                * uf[shape][fids, eids, ...]
-                - fr[key]
-            )
-
-        # print(torch.norm(fl[next(iter(fl.keys()))] + fr[next(iter(fr.keys()))]))
-
-        # pe(fl)
-        # pex(fr)
-
-        for key, (fids, eids) in lhs.items():
-            uf[shape][fids, eids, ...] = fl[key] * sdetl[key].unsqueeze(-1)
-
-        for key, (fids, eids) in rhs.items():
-            uf[shape][fids, eids, ...] = fr[key] * sdetl[key].unsqueeze(-1)
+        self._add_flux(uf, velocity, lhs, nl, fl, sdetl)
+        self._add_flux(uf, velocity, rhs, nr, fr, sdetl)
+        self._add_flux(uf, velocity, bnd, nb, fb, sdetb)
 
         out[shape].add_(basis.lift(uf[shape]))

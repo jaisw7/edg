@@ -21,6 +21,16 @@ class BumpInitialCondition(AdvInitialCondition):
         return usol
 
 
+class SinCosInitialCondition(AdvInitialCondition):
+    kind = "advection-sincos"
+
+    @override
+    def apply(self, x: np.array):
+        return (np.sin(np.pi * x[..., 0]) * np.cos(np.pi * x[..., 1]))[
+            ..., np.newaxis
+        ]
+
+
 def get_initial_condition(cfg, name, *args, **kwargs):
     return get_ic_by_cls_and_name(
         cfg, name, AdvInitialCondition, *args, **kwargs

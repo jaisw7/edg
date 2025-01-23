@@ -60,12 +60,12 @@ class DgMesh:
         return self._element_jac_mat
 
     @property
-    def get_internal_interfaces(self) -> FieldDataTuple:
-        return (self._node_ids_lhs, self._node_ids_rhs)
+    def get_element_jacobian_det(self):
+        return self._element_jac_det
 
     @property
-    def get_boundary_interface(self) -> FieldData:
-        return self._node_ids_bnd
+    def get_internal_interfaces(self) -> FieldDataTuple:
+        return (self._node_ids_lhs, self._node_ids_rhs)
 
     @property
     def get_internal_interface_normals(self) -> FieldData:
@@ -76,8 +76,20 @@ class DgMesh:
         return (self._scaled_jac_det_lhs, None)
 
     @property
-    def get_element_jacobian_det(self):
-        return self._element_jac_det
+    def get_boundary_interfaces(self) -> FieldData:
+        return self._node_ids_bnd
+
+    @property
+    def get_boundary_interface_nodes(self) -> FieldData:
+        return self._nodes_bnd
+
+    @property
+    def get_boundary_interface_normals(self) -> FieldData:
+        return self._normals_bnd
+
+    @property
+    def get_boundary_interface_scaled_jacobian_det(self) -> FieldData:
+        return self._scaled_jac_det_bnd
 
     def _define_basis_at_shapes(self):
         self._basis = {
@@ -153,7 +165,6 @@ class DgMesh:
 
     def _define_connectivity_internal_faces(self):
         self._node_ids_lhs, self._node_ids_rhs = {}, {}
-        self._nodes_lhs, self._nodes_rhs = {}, {}
         self._scaled_jac_det_lhs = {}
         self._normals_lhs, self._normals_rhs = {}, {}
 
@@ -168,10 +179,6 @@ class DgMesh:
                 "_get_interface_face_node_ids"
             )
 
-            self._nodes_lhs[key], self._nodes_rhs[key] = get_both(
-                "_get_interface_face_nodes"
-            )
-
             self._scaled_jac_det_lhs[key] = get(
                 lhs, "_get_interface_face_scaled_jacobian_det"
             )[0]
@@ -183,6 +190,7 @@ class DgMesh:
     def _define_connectivity_boundary_faces(self):
         self._node_ids_bnd = {}
         self._nodes_bnd = {}
+        self._scaled_jac_det_bnd = {}
         self._normals_bnd = {}
 
         for key, lhs in self.pmesh.connectivity_boundaries.items():
@@ -192,8 +200,12 @@ class DgMesh:
 
             self._nodes_bnd[key] = self._get_interface_property(
                 lhs, "_get_interface_face_nodes"
-            )
+            )[0]
+
+            self._scaled_jac_det_bnd[key] = self._get_interface_property(
+                lhs, "_get_interface_face_scaled_jacobian_det"
+            )[0]
 
             self._normals_bnd[key] = self._get_interface_property(
                 lhs, "_get_interface_face_normals"
-            )
+            )[0]

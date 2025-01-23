@@ -6,6 +6,7 @@ from typing_extensions import override
 
 from edgfs2D.basis.base import BaseBasis, get_basis_for_shape
 from edgfs2D.proto.sbp_pb2 import SBP
+from edgfs2D.quadratures.jacobi import ortho_basis_at
 from edgfs2D.utils.dictionary import Dictionary
 from edgfs2D.utils.util import torch_map
 
@@ -61,6 +62,7 @@ class FernandezHickenZingg(BaseBasis):
 
         # define face weights
         self._sqw = np.array(sbp.sqw).flatten()
+        self._sqz = np.array(sbp.sqz).flatten()
 
         # extract surface operators
         self._define_surface_operators()
@@ -204,10 +206,15 @@ class FernandezHickenZingg(BaseBasis):
         N0, N1, N2 = np.cumsum([len(m) for m in mask])
         Nqf = N2
 
+        # since surface quadrature is sufficiently accurate, this is exact
+        def weight(point):
+            V1D = ortho_basis_at(self.degree + 2, point.ravel()).T
+            return np.diag(np.linalg.inv(np.matmul(V1D, V1D.T)).sum(axis=0))
+
         Emat = np.zeros((self._num_nodes, Nqf))
-        Emat[mask[0], 0:N0] = np.diag(self._sqw)
-        Emat[mask[1], N0:N1] = np.diag(self._sqw)
-        Emat[mask[2], N1:N2] = np.diag(self._sqw)
+        Emat[mask[0], 0:N0] = weight(r[mask[0]])
+        Emat[mask[1], N0:N1] = weight(r[mask[1]])
+        Emat[mask[2], N1:N2] = weight(s[mask[2]])
         self._L = np.matmul(self._iH, Emat)
 
     @cached_property
@@ -218,7 +225,6 @@ class FernandezHickenZingg(BaseBasis):
     def grad(
         self, element_data: torch.Tensor, element_jac: torch.Tensor
     ) -> torch.Tensor:
-        # np.set_printoptions(suppress=True, linewidth=2000, precision=3)
         gradu = torch.tensordot(self.grad_op, element_data, dims=1)
         ur, us = gradu[0], gradu[1]
         rx = element_jac[0, ..., 0].unsqueeze(-1)
@@ -228,9 +234,6 @@ class FernandezHickenZingg(BaseBasis):
         gu0 = rx * ur + sx * us
         gradu[1] = ry * ur + sy * us
         gradu[0] = gu0
-        # print(gradu[0].squeeze(-1).squeeze(0).numpy())
-        # print(gradu[1].squeeze(-1).squeeze(0).numpy())
-        # exit(0)
         return gradu
 
     @override

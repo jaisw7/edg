@@ -9,12 +9,17 @@ class AdvBoundaryCondition(BaseBoundaryCondition):
     pass
 
 
-class PeriodicBoundaryCondition(AdvBoundaryCondition):
-    kind = "advection-periodic"
+class SinCosBoundaryCondition(AdvBoundaryCondition):
+    kind = "advection-sincos"
 
     @override
-    def apply(self, ul: torch.Tensor):
-        pass
+    def apply(
+        self, curr_time: torch.float64, ul: torch.Tensor, xl: torch.Tensor
+    ):
+        return (
+            torch.sin(torch.pi * (xl[..., 0] - curr_time))
+            * torch.cos(torch.pi * (xl[..., 1] - curr_time))
+        ).unsqueeze(-1)
 
 
 def get_boundary_condition(cfg, name, *args, **kwargs):

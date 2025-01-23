@@ -10,12 +10,6 @@ from edgfs2D.solvers.base import BaseSolver
 from edgfs2D.time.physical_time import PhysicalTime
 from edgfs2D.utils.dictionary import Dictionary
 
-# np.set_printoptions(suppress=True, linewidth=2000, precision=3)
-
-
-pe = lambda v: print(v[next(iter(v.keys()))][..., 0].numpy())
-pex = lambda v: pe(v) + exit(0)
-
 
 class AdvSolver(BaseSolver):
 
@@ -43,35 +37,24 @@ class AdvSolver(BaseSolver):
 
     def rhs(self, curr_time: torch.float64, u: FieldData):
         advf = self._advf
-        # print(u["tri"][..., 0].numpy()) + exit(0)
 
         # compute convective derivative
         gradu = advf.grad(u)
         conv = advf.convect(gradu)
         conv.mul_(-1)
 
-        # print(conv["tri"][..., 0].numpy()) + exit(0)
-
-        # pex(u)
-        # pe(u)
+        # traces at boundaries
         uf = advf.surface_data(u)
-        # pe(uf)
-        # pex(uf)
-        ul, ur = advf.traces(uf)
-        # pex(ul)
-        # pex(ur)
-        advf.compute_flux(ul, ur)
-        # pe(ul) + pex(ur)
-        # pe(uf)
-        z = FieldData.zeros_like(conv)
-        advf.lift_jump(ul, ur, uf, z)
-        # exit(0)
-        # pe(ul) + pex(ur)
-        # pex(z)
-        conv.add_(z)
+        ul, ur = advf.internal_traces(uf)
+        ulb, urb = advf.boundary_traces(curr_time, uf)
 
-        # print(z["tri"][..., 0].numpy()) + exit(0)
-        # print(conv["tri"][..., 0].numpy()) + exit(0)
+        # fluxes
+        advf.compute_internal_flux(ul, ur)
+        advf.compute_boundary_flux(ulb, urb)
+
+        # lift
+        advf.lift_jump(ul, ur, ulb, uf, conv)
+
         return conv
 
     def solve(self):
@@ -87,19 +70,13 @@ class AdvSolver(BaseSolver):
                 u_new = intg.integrate_at_step(i, time, self._u1, self.rhs)
                 self._u1.copy_(u_new)
 
-            # if time.step == 1:
-            # print(time.time)
-            # print(self._u1["tri"][..., 0].numpy())
-            # exit(0)
             time.increment()
 
-            # t = time.time
-            # x = self._advf._element_nodes["tri"]
-            # ux = (
-            #     torch.sin(torch.pi * (x[..., 0] - t))
-            #     * torch.cos(torch.pi * (x[..., 1] - t))
-            # ).unsqueeze(-1)
-            # print(t, "norm: ", torch.dist(self._u1["tri"], ux).item())
+        x = torch.from_numpy(self._dgmesh._element_nodes["tri"])
+        # u_ex["tri"] = (
+        #     torch.sin(torch.pi * (x[..., 0] - time.time))
+        #     * torch.cos(torch.pi * (x[..., 1] - time.time))
+        # ).unsqueeze(-1)
 
         err = (self._u1["tri"].squeeze() - u_ex["tri"].squeeze()).numpy()
         M = np.linalg.inv(self._dgmesh.get_basis_at_shapes["tri"]._iH)

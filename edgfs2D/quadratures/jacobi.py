@@ -64,11 +64,15 @@ def jac_ortho_basis_at(order, pts):
 
 
 def nodal_basis_at(order, pts, epts):
-    return np.linalg.solve(ortho_basis_at(order, pts), ortho_basis_at(order, epts)).T
+    return np.linalg.solve(
+        ortho_basis_at(order, pts), ortho_basis_at(order, epts)
+    ).T
 
 
 def jac_nodal_basis_at(order, pts, epts):
-    return np.linalg.solve(ortho_basis_at(order, pts), jac_ortho_basis_at(order, epts))
+    return np.linalg.solve(
+        ortho_basis_at(order, pts), jac_ortho_basis_at(order, epts)
+    )
 
 
 """Computation of gauss quadratures via eigenvalue decomposition.
@@ -80,7 +84,9 @@ def rjacobi(n, a, b):
 
     apbp2 = 2.0 + a + b
     ra[0] = (b - a) / apbp2
-    rb[0] = np.power(2.0, a + b + 1) * (gamma(a + 1.0) * gamma(b + 1.0) / gamma(apbp2))
+    rb[0] = np.power(2.0, a + b + 1) * (
+        gamma(a + 1.0) * gamma(b + 1.0) / gamma(apbp2)
+    )
     rb[1] = 4.0 * (a + 1.0) * (b + 1.0) / ((apbp2 + 1.0) * apbp2 * apbp2)
 
     # Compute other terms
