@@ -69,7 +69,6 @@ install_requires = [
     "mako >= 1.0.0",
     "numpy >= 1.8",
     "pytools >= 2016.2.1",
-    #    "pycuda >= 2015.1",
     "torch >= 2.5.1",
     "protobuf>=3.0.0",
     "isort>=5.13.2",
@@ -81,7 +80,7 @@ extras_require = {}
 # Scripts
 console_scripts = [
     "edgfsAdv2D = edgfs2D.solvers.advection.advection:__main__",
-    "edgfsStd2D = edgfs2D.solvers.fast_spectral.std.std:__main__",
+    "edgfsFs2D = edgfs2D.solvers.fast_spectral.fast_spectral:__main__",
 ]
 
 # Info

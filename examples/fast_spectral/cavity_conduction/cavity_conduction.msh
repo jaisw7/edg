@@ -3,10 +3,10 @@ $MeshFormat
 $EndMeshFormat
 $PhysicalNames
 5
-1 5 "left"
+1 5 "bottom"
 1 6 "right"
 1 7 "top"
-1 8 "bottom"
+1 8 "left"
 2 9 "fluid"
 $EndPhysicalNames
 $Entities
@@ -15,10 +15,10 @@ $Entities
 2 0.001 0 0 0 
 3 0.001 0.001 0 0 
 4 0 0.001 0 0 
-1 0 0 0 0.001 0 0 1 8 2 1 -2 
+1 0 0 0 0.001 0 0 1 5 2 1 -2 
 2 0.001 0 0 0.001 0.001 0 1 6 2 2 -3 
 3 0 0.001 0 0.001 0.001 0 1 7 2 3 -4 
-4 0 0 0 0 0.001 0 1 5 2 4 -1 
+4 0 0 0 0 0.001 0 1 8 2 4 -1 
 1 0 0 0 0.001 0.001 0 1 9 4 1 2 3 4 
 $EndEntities
 $Nodes

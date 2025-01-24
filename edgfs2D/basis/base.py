@@ -99,6 +99,13 @@ class BaseBasis(object, metaclass=ABCMeta):
         """Given grad(element_data) and velocity, compute convection"""
         pass
 
+    @abstractmethod
+    def error(
+        self, element_data: torch.Tensor, element_jac_det: torch.Tensor
+    ) -> torch.float64:
+        """Given error at element solution points, compute jacobian weighted error"""
+        pass
+
 
 class StoredBasis(object):
     @classmethod

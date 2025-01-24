@@ -303,7 +303,11 @@ def computeError_3D(df, df2, mesh, vm, basis, dx, dx2):
     xr, yr = map(lambda v: np.einsum("rm,mj->rj", im, v), (x, y))
     # func = lambda v: v.reshape(Ne2, Nq).T
     # func = lambda v: v.reshape(Nq1,Nq1,Ne1,Ne1).swapaxes(1,2).reshape(Nq, Ne2)
-    func = lambda v: v.T.reshape(Nq1, Nq1, Ne1, Ne1).swapaxes(1, 2).reshape(Nq, Ne2)
+    func = (
+        lambda v: v.T.reshape(Nq1, Nq1, Ne1, Ne1)
+        .swapaxes(1, 2)
+        .reshape(Nq, Ne2)
+    )
     func = (
         lambda v: v.reshape(Nq1, Nq1, Ne1, Ne1)
         .swapaxes(1, 2)
@@ -313,7 +317,9 @@ def computeError_3D(df, df2, mesh, vm, basis, dx, dx2):
         .reshape(Nq, Ne2)
     )
 
-    func = lambda v: v.reshape(Nq1, Nq1, Ne1, Ne1).swapaxes(1, 2).reshape(Nq, Ne2)
+    func = (
+        lambda v: v.reshape(Nq1, Nq1, Ne1, Ne1).swapaxes(1, 2).reshape(Nq, Ne2)
+    )
     xr, yr = map(func, (xr, yr))
 
     np.set_printoptions(suppress=True)

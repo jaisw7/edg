@@ -39,15 +39,18 @@ class Dictionary(object):
 
         return Dictionary(file.read(), defaults=defaults)
 
-    def has_section(self, section):
-        return self._cp.has_section(section)
-
     def get_section(self, section):
         items = {}
         if self.has_section(section):
             items.update({section: dict(self._cp.items(section))})
         items.update({cfgsect: dict(self._cp.items(cfgsect))})
         return SubDictionary(section, defaults=items)
+
+    def has_section(self, section):
+        return self._cp.has_section(section)
+
+    def has_option(self, section, option):
+        return self._cp.has_option(section, option)
 
     def lookup(self, section, option, vars=None):
         val = self._cp.get(section, option, vars=vars)
@@ -74,7 +77,7 @@ class Dictionary(object):
         expr = self.lookup(section, option)
 
         # Ensure the expression does not contain invalid characters
-        if not re.match(r"[A-Za-z0-9 \t\n\r.,+\-*/%()<>=\{\}\$]+$", expr):
+        if not re.match(r"[A-Za-z0-9 \t\n\r.,+\-*/%()<>=\{\}\[\]\$]+$", expr):
             raise ValueError("Invalid characters in expression")
 
         # Substitute variables
@@ -161,6 +164,12 @@ class SubDictionary:
     def __init__(self, section, defaults={}):
         self.dict = Dictionary(defaults=defaults)
         self._section = section
+
+    def has_section(self, *args, **kwargs):
+        return self.dict.has_section(*args, **kwargs)
+
+    def has_option(self, *args, **kwargs):
+        return self.dict.has_option(self._section, *args, **kwargs)
 
     def lookup(self, *args, **kwargs):
         return self.dict.lookup(self._section, *args, **kwargs)

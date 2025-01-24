@@ -17,3 +17,7 @@ class BaseSolver(object, metaclass=ABCMeta):
     @abstractproperty
     def time(self):
         pass
+
+    @abstractproperty
+    def mesh(self):
+        pass

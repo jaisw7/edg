@@ -1,4 +1,5 @@
 import numpy as np
+from typing_extensions import override
 
 from edgfs2D.std.velocity_mesh.base import BaseVelocityMesh
 
@@ -38,7 +39,9 @@ class Cartesian(BaseVelocityMesh):
         # define the weight of the velocity mesh
         self._cw = (2.0 * self._L / self._Nv) ** 3
         c0 = np.linspace(
-            -self._L + self._L / self._Nv, self._L - self._L / self._Nv, self._Nv
+            -self._L + self._L / self._Nv,
+            self._L - self._L / self._Nv,
+            self._Nv,
         )
         self._cv = np.zeros((3, self._vsize), dtype=self.cfg.dtype)
         for l in range(self._vsize):
@@ -49,17 +52,27 @@ class Cartesian(BaseVelocityMesh):
             self._cv[1, l] = c0[J]
             self._cv[2, l] = c0[K]
 
-    def Nv(self):
+    @override
+    @property
+    def num_points(self):
         return self._vsize
 
-    def L(self):
+    @override
+    @property
+    def extents(self):
         return self._L
 
+    @override
+    @property
     def shape(self):
         return (self._Nv, self._Nv, self._Nv)
 
+    @override
+    @property
     def points(self):
         return self._cv
 
+    @override
+    @property
     def weights(self):
         return self._cw

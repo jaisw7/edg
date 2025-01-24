@@ -6,7 +6,7 @@ import torch
 from typing_extensions import Dict
 
 from edgfs2D.boundary_conditions.base import BaseBoundaryCondition
-from edgfs2D.fields.types import FieldData, FieldDataTuple
+from edgfs2D.fields.types import FieldData, FieldDataTuple, Shape
 from edgfs2D.fluxes.base import BaseFlux
 from edgfs2D.initial_conditions.base import BaseInitialCondition
 from edgfs2D.physical_mesh.dg_mesh import DgMesh
@@ -54,6 +54,10 @@ class DgField(object, metaclass=ABCMeta):
     @cached_property
     def _element_jac_mat(self):
         return self._to_device(self.dgmesh.get_element_jacobian_mat)
+
+    @cached_property
+    def _element_jac_det(self):
+        return self._to_device(self.dgmesh.get_element_jacobian_det)
 
     @cached_property
     def _element_nodes(self):
@@ -112,6 +116,13 @@ class DgField(object, metaclass=ABCMeta):
         for shape, basis in self.dgmesh.get_basis_at_shapes.items():
             grad_data[shape] = basis.grad(u[shape], element_jac[shape])
         return grad_data
+
+    def error(self, u: FieldData):
+        error_data = {}
+        element_jac_det = self._element_jac_det
+        for shape, basis in self.dgmesh.get_basis_at_shapes.items():
+            error_data[shape] = basis.error(u[shape], element_jac_det[shape])
+        return error_data
 
     def surface_data(self, u: FieldData) -> FieldData:
         surface_data = FieldData()

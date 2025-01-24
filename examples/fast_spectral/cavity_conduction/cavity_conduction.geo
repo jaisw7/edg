@@ -15,20 +15,15 @@ Transfinite Curve{l2} = 3;
 Transfinite Curve{l3} = 3;
 Transfinite Curve{l4} = 3;
 
-Physical Curve("left", 5) = {l4};
+Physical Curve("bottom", 5) = {l1};
 Physical Curve("right", 6) = {l2};
 Physical Curve("top", 7) = {l3};
-Physical Curve("bottom", 8) = {l1};
-
-// periodic mesh
-//Periodic Line {l4} = {l2} Translate {1, 0, 0};
-//Periodic Line {l3} = {l1} Translate {1, 0, 0};
+Physical Curve("left", 8) = {l4};
 
 Curve Loop(1) = {l1, l2, l3, l4};
 Plane Surface(1) = {1};
 Physical Surface("fluid") = {1};
 Transfinite Surface{1} = {l1, l2, l3, l4};
-//Recombine Surface{1};
 
 Mesh 2;
-Save "edgfs2D.msh";
+Save "cavity_conduction.msh";

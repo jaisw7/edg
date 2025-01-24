@@ -13,11 +13,11 @@ class BaseVelocityMesh(object, metaclass=ABCMeta):
         pass
 
     @abstractproperty
-    def Nv(self):
+    def num_points(self):
         pass
 
     @abstractproperty
-    def L(self):
+    def extents(self):
         pass
 
     @abstractproperty

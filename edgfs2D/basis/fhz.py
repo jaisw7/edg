@@ -45,6 +45,7 @@ class FernandezHickenZingg(BaseBasis):
 
         # define inverse mass matrix
         self._iH = np.diag(1 / cw)
+        self._H = np.linalg.inv(self._iH)
 
         # define derivative matrices
         Q = [np.array(Q.values).reshape(-1, self.num_nodes) for Q in sbp.Q]
@@ -253,3 +254,22 @@ class FernandezHickenZingg(BaseBasis):
     @override
     def lift(self, surface_data: torch.Tensor):
         return torch.tensordot(self.lift_op, surface_data, dims=1)
+
+    @cached_property
+    def mass_op(self):
+        return torch.from_numpy(self._H).to(self.cfg.device)
+
+    @override
+    def error(self, error_data: torch.Tensor, element_jac_det: torch.Tensor):
+        return (
+            torch.sqrt(
+                torch.tensordot(
+                    element_jac_det,
+                    torch.tensordot(self.mass_op, error_data**2, dims=1),
+                    dims=[[0, 1], [0, 1]],
+                )
+            )
+            .squeeze()
+            .item()
+            / 4
+        )

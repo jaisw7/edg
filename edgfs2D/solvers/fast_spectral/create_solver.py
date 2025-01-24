@@ -5,13 +5,13 @@ from edgfs2D.fields.dgfield import DgField
 from edgfs2D.fields.types import FieldData, FieldDataList
 from edgfs2D.integrators.base import BaseIntegrator
 from edgfs2D.physical_mesh.dg_mesh import DgMesh
-from edgfs2D.solvers.advection.create_fields import AdvField
+from edgfs2D.solvers.advection.create_fields import FsField
 from edgfs2D.solvers.base import BaseSolver
 from edgfs2D.time.physical_time import PhysicalTime
 from edgfs2D.utils.dictionary import Dictionary
 
 
-class AdvSolver(BaseSolver):
+class FastSpectralSolver(BaseSolver):
 
     def __init__(
         self,
@@ -23,37 +23,37 @@ class AdvSolver(BaseSolver):
         self._time = time
         self._dgmesh = dgmesh
         self._intg = intg
-        self._advf = AdvField(cfg, dgmesh)
+        self._fs = FsField(cfg, dgmesh)
 
         # load plugins
         self._time.load_plugins(self)
 
         # tensors for storage of solutions
-        self._u0 = self._advf.create_new_field()
-        self._u1 = self._advf.create_new_field()
+        self._u0 = self._fs.create_new_field()
+        self._u1 = self._fs.create_new_field()
 
         # apply initial condition
-        self._advf.apply_initial_condition(self._u1)
+        self._fs.apply_initial_condition(self._u1)
 
     def rhs(self, curr_time: torch.float64, u: FieldData):
-        advf = self._advf
+        fs = self._fs
 
         # compute convective derivative
-        gradu = advf.grad(u)
-        conv = advf.convect(gradu)
+        gradu = fs.grad(u)
+        conv = fs.convect(gradu)
         conv.mul_(-1)
 
         # traces at boundaries
-        uf = advf.surface_data(u)
-        ul, ur = advf.internal_traces(uf)
-        ulb, urb = advf.boundary_traces(curr_time, uf)
+        uf = fs.surface_data(u)
+        ul, ur = fs.internal_traces(uf)
+        ulb, urb = fs.boundary_traces(curr_time, uf)
 
         # fluxes
-        advf.compute_internal_flux(ul, ur)
-        advf.compute_boundary_flux(ulb, urb)
+        fs.compute_internal_flux(ul, ur)
+        fs.compute_boundary_flux(ulb, urb)
 
         # lift
-        advf.lift_jump(ul, ur, ulb, uf, conv)
+        fs.lift_jump(ul, ur, ulb, uf, conv)
 
         return conv
 
@@ -89,4 +89,4 @@ class AdvSolver(BaseSolver):
         return self._dgmesh
 
     def error_norm(self, err: FieldData):
-        return self._advf.error(err)
+        return self._fs.error(err)

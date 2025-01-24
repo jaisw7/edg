@@ -14,8 +14,8 @@ class ResidualPlugin(BasePlugin):
     """Write norm"""
 
     def __init__(self, cfg: SubDictionary, solver: BaseSolver):
-        self._nsteps = cfg.lookupint("nsteps")
-        self._solver = solver
+        super().__init__(cfg, solver)
+        self._nsteps = super().get_nsteps()
 
     def __call__(self):
         time = self._solver.time
