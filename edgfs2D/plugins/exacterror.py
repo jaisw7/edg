@@ -7,6 +7,7 @@ from edgfs2D.plugins.base import BasePlugin
 from edgfs2D.solvers.base import BaseSolver
 from edgfs2D.utils.dictionary import SubDictionary
 from edgfs2D.utils.nputil import npeval
+from edgfs2D.utils.util import to_torch_device
 
 
 class ExactErrorPlugin(BasePlugin):
@@ -29,8 +30,8 @@ class ExactErrorPlugin(BasePlugin):
                 "y": mesh._element_nodes[shape][..., 1].squeeze(),
                 "t": time,
             }
-            exact_sol[shape] = torch.from_numpy(
-                npeval(self._expr, locals)
+            exact_sol[shape] = to_torch_device(
+                npeval(self._expr, locals), self._cfg
             ).unsqueeze(-1)
         return exact_sol
 
@@ -46,6 +47,7 @@ class ExactErrorPlugin(BasePlugin):
             )
             curr = solver.curr_fields[0]
             exact = self._get_exact(time.time)
+            print(curr["tri"].device, exact["tri"].device)
             exact.sub_(curr)
             error = solver.error_norm(exact)
             print("error: ", sum(error.values()))
