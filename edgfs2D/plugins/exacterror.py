@@ -47,7 +47,6 @@ class ExactErrorPlugin(BasePlugin):
             )
             curr = solver.curr_fields[0]
             exact = self._get_exact(time.time)
-            print(curr["tri"].device, exact["tri"].device)
             exact.sub_(curr)
             error = solver.error_norm(exact)
             print("error: ", sum(error.values()))
