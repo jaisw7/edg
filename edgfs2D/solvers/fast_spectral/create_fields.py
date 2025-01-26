@@ -2,9 +2,9 @@ import numpy as np
 import torch
 from typing_extensions import override
 
+from edgfs2D.distribution_mesh.dgdist_mesh import DgDistMesh
 from edgfs2D.fields.dgfield import DgField
 from edgfs2D.fields.types import FieldData, FieldDataTuple
-from edgfs2D.physical_mesh.dg_mesh import DgMesh
 from edgfs2D.solvers.fast_spectral.create_boundary_conditions import (
     get_boundary_condition,
 )
@@ -20,22 +20,28 @@ class FsField(DgField):
     fields = ["f"]
     kind = "fast-spectral"
 
-    def __init__(self, cfg: Dictionary, dgmesh: DgMesh):
-        super().__init__(cfg, dgmesh, self.nfields)
+    def __init__(self, cfg: Dictionary, distmesh: DgDistMesh):
+        self.nfields = distmesh.vmesh.num_points
+        self._distmesh = distmesh
+        super().__init__(cfg, distmesh.dgmesh, self.nfields)
 
         # define boundary conditions
         self._bnds: Dict[str, BaseBoundaryCondition] = {}
         for kind, _ in self.dgmesh.get_boundary_interfaces.items():
             self._bnds[kind] = get_boundary_condition(
-                self.cfg, "{}-{}".format(self.kind, kind)
+                self.cfg,
+                "{}-{}".format(self.kind, kind),
+                self._boundary_interface_nodes[kind],
+                self._boundary_interface_normals[kind],
+                distmesh.vmesh,
             )
 
         # define flux
-        self._flux = get_flux(self.cfg, self.kind)
+        self._flux = get_flux(self.cfg, self.kind, distmesh.vmesh)
         self._velocity = self._flux.velocity
 
     def apply_initial_condition(self, u: FieldData):
-        ic = get_initial_condition(self.cfg, self.kind)
+        ic = get_initial_condition(self.cfg, self.kind, self._distmesh.vmesh)
         super()._apply_initial_condition(u, ic)
 
     def internal_traces(self, uf: FieldData) -> FieldDataTuple:

@@ -1,32 +1,30 @@
 import numpy as np
 from typing_extensions import override
 
-from edgfs2D.std.velocity_mesh.base import BaseVelocityMesh
+from edgfs2D.velocity_mesh.base import BaseVelocityMesh
 
 
 class Cartesian(BaseVelocityMesh):
     kind = "cartesian"
 
-    def __init__(self, cfg, name, *args, **kwargs):
-        super().__init__(cfg, name, *args, **kwargs)
-        self._construct_velocity_mesh(self.nondim)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._construct_velocity_mesh()
 
-    def _construct_velocity_mesh(self, nondim):
-        sect = self.sect
-
+    def _construct_velocity_mesh(self):
         # define the velocity mesh
-        self._Nv = self.cfg.lookupint(sect, "Nv")
+        self._Nv = self._cfg.lookupint("Nv")
         self._vsize = self._Nv**3
 
-        _cmax = self.cfg.lookupfloat(sect, "cmax")
-        _Tmax = self.cfg.lookupfloat(sect, "Tmax")
-        _dev = self.cfg.lookupfloat(sect, "dev")
+        _cmax = self._cfg.lookupfloat("cmax")
+        _Tmax = self._cfg.lookupfloat("Tmax")
+        _dev = self._cfg.lookupfloat("dev")
 
         # normalize maximum bulk velocity
-        _cmax /= nondim.u0
+        _cmax /= self._nondim.u0
 
         # normalize maximum bulk temperature
-        _Tmax /= nondim.T0
+        _Tmax /= self._nondim.T0
 
         # define the length of the velocity mesh
         self._L = _cmax + _dev * np.sqrt(_Tmax)
@@ -43,7 +41,7 @@ class Cartesian(BaseVelocityMesh):
             self._L - self._L / self._Nv,
             self._Nv,
         )
-        self._cv = np.zeros((3, self._vsize), dtype=self.cfg.dtype)
+        self._cv = np.zeros((3, self._vsize), dtype=self._cfg.dtype)
         for l in range(self._vsize):
             I = int(l / (self._Nv * self._Nv))
             J = int((l % (self._Nv * self._Nv)) / self._Nv)

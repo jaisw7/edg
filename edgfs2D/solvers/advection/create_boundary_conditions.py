@@ -14,8 +14,11 @@ class SinCosBoundaryCondition(AdvBoundaryCondition):
 
     @override
     def apply(
-        self, curr_time: torch.float64, ul: torch.Tensor, xl: torch.Tensor
+        self,
+        curr_time: torch.float64,
+        ul: torch.Tensor,
     ):
+        xl = self._nodes
         return (
             torch.sin(torch.pi * (xl[..., 0] - curr_time))
             * torch.cos(torch.pi * (xl[..., 1] - curr_time))

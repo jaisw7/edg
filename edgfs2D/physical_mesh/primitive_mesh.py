@@ -46,6 +46,9 @@ class PrimitiveMesh(object):
         # define element shapes in the domain
         self._ele_shapes = self._vertex.keys()
 
+        # define dimension
+        self._dim = 2
+
     _meshTypes = {"gmsh": loadgmsh}
 
     def __init__(self, global_cfg: Dictionary, time: PhysicalTime):
@@ -73,3 +76,7 @@ class PrimitiveMesh(object):
     @property
     def element_shapes(self):
         return self._ele_shapes
+
+    @property
+    def dim(self):
+        return self._dim

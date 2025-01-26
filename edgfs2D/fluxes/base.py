@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 
 
 class BaseFlux(object, metaclass=ABCMeta):
@@ -8,4 +8,8 @@ class BaseFlux(object, metaclass=ABCMeta):
 
     @abstractmethod
     def apply(self, *args, **kwargs):
+        pass
+
+    @abstractproperty
+    def velocity(self):
         pass

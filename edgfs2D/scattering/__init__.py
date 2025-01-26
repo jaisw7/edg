@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from edgfs2D.std.scattering.base import BaseScatteringModel
-from edgfs2D.std.scattering.fast_spectral import FastSpectral
+from edgfs2D.scattering.base import BaseScatteringModel
+from edgfs2D.scattering.fast_spectral import FastSpectral
 from edgfs2D.utils.nputil import subclass_where
 
 scattering_sect = "scattering-model"
@@ -8,7 +8,10 @@ scattering_sect = "scattering-model"
 
 def get_scattering_model_by_name(cfg, name, *args, **kwargs):
     smKind = cfg.lookup(name, "kind")
-    return subclass_where(BaseScatteringModel, kind=smKind)(cfg, name, *args, **kwargs)
+    smSect = cfg.get_section(scattering_sect)
+    return subclass_where(BaseScatteringModel, kind=smKind)(
+        smSect, *args, **kwargs
+    )
 
 
 def get_scattering_model(cfg, *args, **kwargs):

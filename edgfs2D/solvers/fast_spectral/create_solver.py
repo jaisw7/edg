@@ -1,12 +1,13 @@
 import numpy as np
 import torch
 
+from edgfs2D.distribution_mesh.dgdist_mesh import DgDistMesh
 from edgfs2D.fields.dgfield import DgField
 from edgfs2D.fields.types import FieldData, FieldDataList
 from edgfs2D.integrators.base import BaseIntegrator
-from edgfs2D.physical_mesh.dg_mesh import DgMesh
-from edgfs2D.solvers.advection.create_fields import FsField
+from edgfs2D.scattering import get_scattering_model
 from edgfs2D.solvers.base import BaseSolver
+from edgfs2D.solvers.fast_spectral.create_fields import FsField
 from edgfs2D.time.physical_time import PhysicalTime
 from edgfs2D.utils.dictionary import Dictionary
 
@@ -17,13 +18,13 @@ class FastSpectralSolver(BaseSolver):
         self,
         cfg: Dictionary,
         time: PhysicalTime,
-        dgmesh: DgMesh,
+        distmesh: DgDistMesh,
         intg: BaseIntegrator,
     ):
         self._time = time
-        self._dgmesh = dgmesh
+        self._distmesh = distmesh
         self._intg = intg
-        self._fs = FsField(cfg, dgmesh)
+        self._fs = FsField(cfg, distmesh)
 
         # load plugins
         self._time.load_plugins(self)
@@ -34,6 +35,9 @@ class FastSpectralSolver(BaseSolver):
 
         # apply initial condition
         self._fs.apply_initial_condition(self._u1)
+
+        # scattering model
+        self._sm = get_scattering_model(cfg, distmesh.vmesh)
 
     def rhs(self, curr_time: torch.float64, u: FieldData):
         fs = self._fs
@@ -54,6 +58,10 @@ class FastSpectralSolver(BaseSolver):
 
         # lift
         fs.lift_jump(ul, ur, ulb, uf, conv)
+
+        # add scattering
+        for shape in u.keys():
+            self._sm.solve(curr_time, u[shape], out=conv[shape])
 
         return conv
 
@@ -85,8 +93,8 @@ class FastSpectralSolver(BaseSolver):
         return self._time
 
     @property
-    def mesh(self) -> DgMesh:
-        return self._dgmesh
+    def mesh(self) -> DgDistMesh:
+        return self._distmesh
 
     def error_norm(self, err: FieldData):
         return self._fs.error(err)

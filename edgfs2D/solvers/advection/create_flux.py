@@ -16,8 +16,10 @@ class LaxFriedrichsFlux(AdvFlux):
 
     def __init__(self, cfg: SubDictionary, *args, **kwargs):
         super().__init__(cfg, *args, **kwargs)
-        self._velocity = torch.from_numpy(cfg.lookupfloat_list("velocity")).to(
-            dtype=torch_map[cfg.dtypename], device=cfg.device
+        self._velocity = (
+            torch.from_numpy(cfg.lookupfloat_list("velocity"))
+            .to(dtype=cfg.ttype, device=cfg.device)
+            .reshape(-1, 1)
         )
 
     @property
@@ -27,7 +29,7 @@ class LaxFriedrichsFlux(AdvFlux):
     @override
     def apply(self, ul: torch.Tensor, ur: torch.Tensor, nl: torch.Tensor):
         # As per Hasthaven pp. 170, Ch. 6
-        nu = torch.tensordot(nl, self._velocity, dims=1).unsqueeze(-1)
+        nu = torch.tensordot(nl, self._velocity, dims=1)
         C = nu.abs().max()
         flux = 0.5 * (nu * (ul + ur) + C * (ul - ur))
 

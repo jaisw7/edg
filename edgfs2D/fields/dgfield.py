@@ -13,7 +13,7 @@ from edgfs2D.physical_mesh.dg_mesh import DgMesh
 from edgfs2D.utils.dictionary import Dictionary
 from edgfs2D.utils.util import to_torch, torch_map
 
-np.set_printoptions(suppress=True, linewidth=2000, precision=2)
+# np.set_printoptions(suppress=True, linewidth=2000, precision=2)
 
 
 class DgField(object, metaclass=ABCMeta):
@@ -153,16 +153,11 @@ class DgField(object, metaclass=ABCMeta):
         uf: FieldData,
         bc: Dict[str, BaseBoundaryCondition],
     ) -> FieldDataTuple:
-        pe = lambda v: print(v[next(iter(v.keys()))].squeeze().numpy())
-        pex = lambda v: pe(v) + exit(0)
-
         shape = self._get_shape
         trace_lhs, trace_rhs = FieldData(), FieldData()
         for key, (fids, eids) in self.dgmesh.get_boundary_interfaces.items():
             trace_lhs[key] = uf[shape][fids, eids, ...]
-            trace_rhs[key] = bc[key].apply(
-                curr_time, trace_lhs[key], self._boundary_interface_nodes[key]
-            )
+            trace_rhs[key] = bc[key].apply(curr_time, trace_lhs[key])
         return (trace_lhs, trace_rhs)
 
     def _compute_flux(
@@ -180,8 +175,9 @@ class DgField(object, metaclass=ABCMeta):
     def _add_flux(self, uf, velocity, interface, nl, fl, sdetl):
         shape = self._get_shape
         for key, (fids, eids) in interface.items():
+            dim = min(nl[key].shape[1], velocity.shape[0])
             uf[shape][fids, eids, ...] = (
-                torch.tensordot(nl[key], velocity, dims=1).unsqueeze(-1)
+                torch.tensordot(nl[key], velocity[:dim], dims=1)
                 * uf[shape][fids, eids, ...]
                 - fl[key]
             ) * sdetl[key].unsqueeze(-1)

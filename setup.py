@@ -27,6 +27,7 @@ modules = [
     "edgfs2D.basis",
     "edgfs2D.basis.tri",
     "edgfs2D.boundary_conditions",
+    "edgfs2D.distribution_mesh",
     "edgfs2D.fields",
     "edgfs2D.fields.readers",
     "edgfs2D.fields.writers",
@@ -39,6 +40,7 @@ modules = [
     "edgfs2D.plugins",
     "edgfs2D.proto",
     "edgfs2D.quadratures",
+    "edgfs2D.scattering",
     "edgfs2D.sphericaldesign",
     "edgfs2D.sphericaldesign.symmetric",
     "edgfs2D.solvers",
@@ -46,7 +48,6 @@ modules = [
     "edgfs2D.solvers.fast_spectral.std.kernels",
     "edgfs2D.solvers.fast_spectral.std.kernels.bcs",
     "edgfs2D.solvers.fast_spectral.std.kernels.scattering",
-    "edgfs2D.solvers.fast_spectral.std.scattering",
     "edgfs2D.velocity_mesh",
     "edgfs2D.utils",
 ]

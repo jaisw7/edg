@@ -23,4 +23,4 @@ def get_plugin_for_solver(cfg, solver, name, *args, **kwargs):
     if solver in cls.allowed_solvers:
         return cls(sect, *args, **kwargs)
     else:
-        return None
+        raise RuntimeError(f"plugin {name} does not support {solver}")

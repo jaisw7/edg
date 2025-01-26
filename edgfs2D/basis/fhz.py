@@ -10,8 +10,6 @@ from edgfs2D.quadratures.jacobi import ortho_basis_at
 from edgfs2D.utils.dictionary import Dictionary
 from edgfs2D.utils.util import torch_map
 
-np.set_printoptions(precision=3, linewidth=1e10)
-
 
 # The nodal DG due to D. Del Rey Fernández, J. Hicken, and D. Zingg.
 class FernandezHickenZingg(BaseBasis):
@@ -245,7 +243,10 @@ class FernandezHickenZingg(BaseBasis):
     def convect(
         self, grad_element_data: torch.Tensor, velocity: torch.Tensor
     ) -> torch.Tensor:
-        return torch.tensordot(velocity, grad_element_data, dims=1)
+        return (
+            velocity[0] * grad_element_data[0]
+            + velocity[1] * grad_element_data[1]
+        )
 
     @cached_property
     def lift_op(self):

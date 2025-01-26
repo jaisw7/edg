@@ -6,7 +6,7 @@ from configparser import NoOptionError, NoSectionError, SafeConfigParser
 
 import numpy as np
 
-from edgfs2D.utils.util import np_map, torch_map
+from edgfs2D.utils.util import np_map, torch_cmap, torch_map
 
 cfgsect = "config"
 
@@ -28,9 +28,10 @@ class Dictionary(object):
             cp.read_dict(defaults)
 
         self._dtypename = self.lookupordefault(cfgsect, "precision", "double")
-        self._dtype = np_map[self._dtypename]
         self._device = self.lookupordefault(cfgsect, "device", "cpu")
+        self._dtype = np_map[self._dtypename]
         self._ttype = torch_map[self._dtypename]
+        self._cttype = torch_cmap[self._dtypename]
 
     @staticmethod
     def load(file, defaults={}):
@@ -144,10 +145,6 @@ class Dictionary(object):
 
     # Global configurations that are required in all systems
     @property
-    def dtypename(self):
-        return self._dtypename
-
-    @property
     def dtype(self):
         return self._dtype
 
@@ -158,6 +155,10 @@ class Dictionary(object):
     @property
     def ttype(self):
         return self._ttype
+
+    @property
+    def cttype(self):
+        return self._cttype
 
 
 class SubDictionary:
@@ -205,10 +206,6 @@ class SubDictionary:
         return self.dict.lookup_list(self._section, *args)
 
     @property
-    def dtypename(self):
-        return self.dict._dtypename
-
-    @property
     def dtype(self):
         return self.dict._dtype
 
@@ -219,3 +216,7 @@ class SubDictionary:
     @property
     def device(self):
         return self.dict._device
+
+    @property
+    def cttype(self):
+        return self.dict._cttype

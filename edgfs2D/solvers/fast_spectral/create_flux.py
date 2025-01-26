@@ -5,6 +5,7 @@ from edgfs2D.fluxes import get_flux_by_cls_and_name
 from edgfs2D.fluxes.base import BaseFlux
 from edgfs2D.utils.dictionary import SubDictionary
 from edgfs2D.utils.util import torch_map
+from edgfs2D.velocity_mesh.base import BaseVelocityMesh
 
 
 class FastSpectralFlux(BaseFlux):
@@ -18,8 +19,11 @@ class LaxFriedrichsFlux(FastSpectralFlux):
         self, cfg: SubDictionary, vm: BaseVelocityMesh, *args, **kwargs
     ):
         super().__init__(cfg, *args, **kwargs)
-        self._velocity = vm.points
+        self._velocity = torch.from_numpy(vm.points).to(
+            dtype=cfg.ttype, device=cfg.device
+        )
 
+    @override
     @property
     def velocity(self):
         return self._velocity
@@ -27,7 +31,8 @@ class LaxFriedrichsFlux(FastSpectralFlux):
     @override
     def apply(self, ul: torch.Tensor, ur: torch.Tensor, nl: torch.Tensor):
         # As per Hasthaven pp. 170, Ch. 6
-        nu = torch.tensordot(nl, self._velocity, dims=1).unsqueeze(-1)
+        dim = nl.shape[1]
+        nu = torch.tensordot(nl, self._velocity[:dim, :], dims=1)
         C = nu.abs().max()
         flux = 0.5 * (nu * (ul + ur) + C * (ul - ur))
 

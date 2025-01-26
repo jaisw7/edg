@@ -11,6 +11,7 @@ np_rmap = {np.float32: "float", np.float64: "double"}
 
 torch_map = {"float": t.float32, "double": t.float64}
 torch_rmap = {t.float32: "float", t.float64: "double"}
+torch_cmap = {"float": t.complex64, "double": t.complex128}
 
 
 def get_kernel(module, funcname, args):
@@ -22,6 +23,10 @@ def get_kernel(module, funcname, args):
 
 def to_torch(data: Union[t.Tensor, np.ndarray]):
     return data if isinstance(data, t.Tensor) else t.from_numpy(data)
+
+
+def to_torch_device(data: np.ndarray, cfg):
+    return t.from_numpy(data).to(device=cfg.device, dtype=cfg.ttype)
 
 
 def filter_tol(mat, tol=1e-15, val=0.0):

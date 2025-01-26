@@ -27,7 +27,10 @@ class AdvField(DgField):
         self._bnds: Dict[str, BaseBoundaryCondition] = {}
         for kind, _ in self.dgmesh.get_boundary_interfaces.items():
             self._bnds[kind] = get_boundary_condition(
-                self.cfg, "{}-{}".format(self.kind, kind)
+                self.cfg,
+                "{}-{}".format(self.kind, kind),
+                self._boundary_interface_nodes[kind],
+                self._boundary_interface_normals[kind],
             )
 
         # define flux

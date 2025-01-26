@@ -3,10 +3,9 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 
 class BaseVelocityMesh(object, metaclass=ABCMeta):
 
-    def __init__(self, cfg, name, nondim, *args, **kwargs):
-        self.cfg = cfg
-        self.sect = name
-        self.nondim = nondim
+    def __init__(self, cfg, nondim, *args, **kwargs):
+        self._cfg = cfg
+        self._nondim = nondim
 
     @abstractmethod
     def _construct_velocity_mesh(self, nondim):
@@ -31,3 +30,7 @@ class BaseVelocityMesh(object, metaclass=ABCMeta):
     @abstractproperty
     def weights(self):
         pass
+
+    @property
+    def nondim(self):
+        return self._nondim
