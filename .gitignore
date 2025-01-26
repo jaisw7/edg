@@ -13,6 +13,7 @@ doc/build/
 
 # Solution files
 *.txt
+!edgfs2D/sphericaldesign/symmetric/*.txt
 *.h5*
 
 *.gz
