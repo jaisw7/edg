@@ -72,7 +72,7 @@ install_requires = [
     "numpy >= 1.8",
     "pytools >= 2016.2.1",
     "torch >= 2.5.1",
-    "protobuf>=5.29.3",
+    "protobuf>=4.0.0",
     "isort>=5.13.2",
 ]
 
