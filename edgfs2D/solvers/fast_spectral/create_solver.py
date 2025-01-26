@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 import torch
 
@@ -98,3 +100,6 @@ class FastSpectralSolver(BaseSolver):
 
     def error_norm(self, err: FieldData):
         return self._fs.error(err)
+
+    def write(self, path: Path):
+        return self._fs.write(path, FieldData({"u": self._u1}))

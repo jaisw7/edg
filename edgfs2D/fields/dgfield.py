@@ -1,5 +1,6 @@
 from abc import ABCMeta
 from functools import cached_property
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -7,13 +8,12 @@ from typing_extensions import Dict
 
 from edgfs2D.boundary_conditions.base import BaseBoundaryCondition
 from edgfs2D.fields.types import FieldData, FieldDataTuple, Shape
+from edgfs2D.fields.writers.h5 import H5FieldWriter
 from edgfs2D.fluxes.base import BaseFlux
 from edgfs2D.initial_conditions.base import BaseInitialCondition
 from edgfs2D.physical_mesh.dg_mesh import DgMesh
 from edgfs2D.utils.dictionary import Dictionary
 from edgfs2D.utils.util import to_torch, torch_map
-
-# np.set_printoptions(suppress=True, linewidth=2000, precision=2)
 
 
 class DgField(object, metaclass=ABCMeta):
@@ -208,3 +208,9 @@ class DgField(object, metaclass=ABCMeta):
         self._add_flux(uf, velocity, bnd, nb, fb, sdetb)
 
         out[shape].add_(basis.lift(uf[shape]))
+
+    def write(self, path: Path, data: FieldData):
+        writer = H5FieldWriter(path)
+        writer.write_fields(data)
+        writer.write_metadata("uuid", self.dgmesh.uuid)
+        writer.write_metadata("time", self.dgmesh.time.time)

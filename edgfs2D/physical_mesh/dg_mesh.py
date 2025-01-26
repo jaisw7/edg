@@ -32,6 +32,14 @@ class DgMesh:
         self._define_connectivity_boundary_faces()
 
     @property
+    def uuid(self):
+        return self.pmesh.uuid
+
+    @property
+    def time(self):
+        return self.pmesh.time
+
+    @property
     def get_basis_at_shapes(self):
         return self._basis
 

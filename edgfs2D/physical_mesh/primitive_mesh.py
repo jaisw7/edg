@@ -11,7 +11,7 @@ class PrimitiveMesh(object):
     """Defines a primitive mesh"""
 
     def loadgmsh(self):
-        meshfile = self.time.args.mesh
+        meshfile = self._time.args.mesh
         from edgfs2D.physical_mesh.readers import get_reader_by_name
 
         reader = get_reader_by_name("gmsh", meshfile)
@@ -46,16 +46,16 @@ class PrimitiveMesh(object):
         # define element shapes in the domain
         self._ele_shapes = self._vertex.keys()
 
-        # define dimension
-        self._dim = 2
+        # define mesh uuid
+        self._uuid = xmesh["mesh_uuid"]
 
     _meshTypes = {"gmsh": loadgmsh}
 
     def __init__(self, global_cfg: Dictionary, time: PhysicalTime):
-        self.cfg = global_cfg.get_section(msect)
-        self.time = time
+        self._cfg = global_cfg.get_section(msect)
+        self._time = time
 
-        mt = self.cfg.lookupordefault("kind", "gmsh")
+        mt = self._cfg.lookupordefault("kind", "gmsh")
         assert mt in self._meshTypes, "Valid mesh:" + str(
             self._meshTypes.keys()
         )
@@ -78,5 +78,9 @@ class PrimitiveMesh(object):
         return self._ele_shapes
 
     @property
-    def dim(self):
-        return self._dim
+    def uuid(self):
+        return self._uuid
+
+    @property
+    def time(self):
+        return self._time

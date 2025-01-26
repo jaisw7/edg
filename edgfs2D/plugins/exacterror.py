@@ -43,7 +43,7 @@ class ExactErrorPlugin(BasePlugin):
 
             print(
                 "comparing numerical solution with exact solution at time =",
-                f"{time.time: 0.6g}",
+                f"{time.time:0.6g}",
             )
             curr = solver.curr_fields[0]
             exact = self._get_exact(time.time)

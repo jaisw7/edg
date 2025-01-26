@@ -1,7 +1,5 @@
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from pathlib import Path
-
-import h5py
 
 
 class BaseFieldReader(object, metaclass=ABCMeta):
@@ -10,6 +8,6 @@ class BaseFieldReader(object, metaclass=ABCMeta):
             raise ValueError(f"file path {path.absolute()} not valid")
         self._path = path
 
-    def get_metadata(self, key):
-        with h5py.File(self._path, "r") as h5f:
-            return h5f.attrs.get(key)
+    @abstractmethod
+    def read_metadata(self, key):
+        pass

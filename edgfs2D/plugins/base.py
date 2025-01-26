@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from pathlib import Path
 
 import numpy as np
 
@@ -27,6 +28,20 @@ class BasePlugin(object, metaclass=ABCMeta):
         else:
             time = self._cfg.lookupfloat("time")
             return int(np.ceil(time / self._solver.time.dt))
+
+    def get_basename(self):
+        if not (self._cfg.has_option("basename")):
+            raise ValueError(f"basename must be provided for plugin", self.kind)
+
+        basedir = Path(self._cfg.lookuppath("basedir", ".", abs=True))
+
+        if not basedir.is_dir():
+            raise ValueError(
+                f"basedir {basedir} provided for plugin {self.kind} does not exist"
+            )
+
+        basename = self._cfg.lookup("basename")
+        return (basedir, basename)
 
     @abstractmethod
     def __call__(self):

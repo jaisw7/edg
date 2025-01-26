@@ -4,7 +4,7 @@ from pathlib import Path
 
 import numpy as np
 
-from edgfs2D.fields.readers import BaseFieldReader
+from edgfs2D.fields.readers.h5 import H5FieldReader
 from edgfs2D.plugins import get_plugin_for_solver, get_plugin_sections
 from edgfs2D.solvers.base import BaseSolver
 from edgfs2D.utils.dictionary import Dictionary
@@ -79,7 +79,7 @@ class PhysicalTime(object):
     def _define_start_time(self):
         if self.is_restart:
             path = Path(args.dist[0].name)
-            return BaseFieldReader(path).get_metadata("time")
+            return H5FieldReader(path).get_metadata("time")
         else:
             return self._cfg.lookupfloat("tstart")
 

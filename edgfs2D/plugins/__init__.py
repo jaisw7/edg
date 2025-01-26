@@ -5,6 +5,7 @@ from edgfs2D.plugins.base import BasePlugin
 from edgfs2D.plugins.exacterror import ExactErrorPlugin
 from edgfs2D.plugins.nancheck import NanCheckPlugin
 from edgfs2D.plugins.residual import ResidualPlugin
+from edgfs2D.plugins.solutionwriter import SolutionWriterPlugin
 from edgfs2D.utils.nputil import subclass_where
 
 plugins_sect = "plugin"
