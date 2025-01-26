@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import torch
+from loguru import logger
 
 from edgfs2D.plugins.base import BasePlugin
 from edgfs2D.solvers.base import BaseSolver
@@ -29,7 +30,7 @@ class SolutionWriterPlugin(BasePlugin):
                 self._basename.format(t=time.time)
             )
             self._solver.write(filename)
-            print(
+            logger.info(
                 f"written solution in directory {self._basedir} at time =",
                 f"{time.time: 0.6g}",
             )

@@ -1,4 +1,5 @@
 import numpy as np
+from loguru import logger
 from typing_extensions import override
 
 from edgfs2D.velocity_mesh.base import BaseVelocityMesh
@@ -30,7 +31,7 @@ class Cartesian(BaseVelocityMesh):
         self._L = _cmax + _dev * np.sqrt(_Tmax)
         self._S = self._L * 2.0 / (3.0 + np.sqrt(2.0))
         self._R = 2 * self._S
-        print("velocityMesh: (%s %s)" % (-self._L, self._L))
+        logger.info("velocityMesh: ({} {})", -self._L, self._L)
 
         self._dev = _dev
 

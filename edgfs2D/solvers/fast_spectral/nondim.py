@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
+from loguru import logger
 
 from edgfs2D.utils.dictionary import Dictionary
 
@@ -18,7 +19,9 @@ class NondimParams(object):
         self._molarMass0 = cfg.lookupfloat(nondim_sect, "molarMass0")  # kg/mol
         self._n0 = self._rho0 / self._molarMass0 * self.NA
         self._u0 = np.sqrt(2 * self.R0 / self._molarMass0 * self._T0)
-        print("n0, u0, t0: (%s %s %s)" % (self._n0, self._u0, self._H0 / self._u0))
+        logger.info(
+            "n0, u0, t0: ({} {} {})", self._n0, self._u0, self._H0 / self._u0
+        )
 
     @property
     def H0(self):

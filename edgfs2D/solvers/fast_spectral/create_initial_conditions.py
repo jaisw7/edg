@@ -1,6 +1,7 @@
 from functools import cached_property
 
 import numpy as np
+from loguru import logger
 from typing_extensions import override
 
 from edgfs2D.initial_conditions import get_ic_by_cls_and_name
@@ -97,13 +98,13 @@ class MaxwellianInitialCondition(FastSpectralInitialCondition):
             and np.allclose(self._uini[2, 0] * u0, ele_sol[3] * u0, atol=1e-5)
             and np.allclose(self._Tini * T0, ele_sol[4] * T0, atol=1e-5)
         ):
-            print("Bulk properties not conserved!")
-            print("Calculated bulk properties based on provided inputs:")
-            print("mass-density:", self._rhoini * rho0, ele_sol[0] * rho0)
-            print("x-velocity:", self._uini[0, 0] * u0, ele_sol[1] * u0)
-            print("y-velocity:", self._uini[1, 0] * u0, ele_sol[2] * u0)
-            print("z-velocity:", self._uini[2, 0] * u0, ele_sol[3] * u0)
-            print("temperature:", self._Tini * T0, ele_sol[4] * T0)
+            logger.info("Bulk properties not conserved!")
+            logger.info("Calculated bulk properties based on provided inputs:")
+            logger.info("mass-density:", self._rhoini * rho0, ele_sol[0] * rho0)
+            logger.info("x-velocity:", self._uini[0, 0] * u0, ele_sol[1] * u0)
+            logger.info("y-velocity:", self._uini[1, 0] * u0, ele_sol[2] * u0)
+            logger.info("z-velocity:", self._uini[2, 0] * u0, ele_sol[3] * u0)
+            logger.info("temperature:", self._Tini * T0, ele_sol[4] * T0)
             raise ValueError("Check velocity mesh parameters")
 
     @override

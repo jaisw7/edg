@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import logging
 import os
 import re
 import subprocess
@@ -10,7 +11,7 @@ from setuptools import setup
 
 # Python version
 if sys.version_info[:2] < (3, 3):
-    print("edgfs2D requires Python 3.3 or newer")
+    logging.error("edgfs2D requires Python 3.3 or newer")
     sys.exit(-1)
 
 # DGFS version
@@ -20,7 +21,7 @@ vsrch = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", vfile, re.M)
 if vsrch:
     version = vsrch.group(1)
 else:
-    print("Unable to find a version string in _version.py")
+    logging.error("Unable to find a version string in _version.py")
 
 # Modules
 modules = [
@@ -74,6 +75,7 @@ install_requires = [
     "torch >= 2.5.1",
     "protobuf>=4.0.0",
     "isort>=5.13.2",
+    "loguru>=0.7.3",
 ]
 
 # Soft dependencies

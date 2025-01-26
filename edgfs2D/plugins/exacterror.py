@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import torch
+from loguru import logger
 
 from edgfs2D.fields.types import FieldData
 from edgfs2D.plugins.base import BasePlugin
@@ -41,12 +42,12 @@ class ExactErrorPlugin(BasePlugin):
 
         if time.should_output(self._nsteps):
 
-            print(
-                "comparing numerical solution with exact solution at time =",
+            logger.info(
+                "comparing numerical solution with exact solution at time = {}",
                 f"{time.time:0.6g}",
             )
             curr = solver.curr_fields[0]
             exact = self._get_exact(time.time)
             exact.sub_(curr)
             error = solver.error_norm(exact)
-            print("error: ", sum(error.values()))
+            logger.info("error: {}", sum(error.values()))

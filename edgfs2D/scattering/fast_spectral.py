@@ -2,6 +2,7 @@ from math import gamma
 
 import numpy as np
 import torch
+from loguru import logger
 
 from edgfs2D.quadratures.jacobi import zwgj
 from edgfs2D.scattering.base import BaseScatteringModel
@@ -22,7 +23,7 @@ class FastSpectral(BaseScatteringModel):
         super().__init__(cfg, vmesh, *args, **kwargs)
         self.load_parameters()
         self.perform_precomputation()
-        print("scattering-model: finished computation")
+        logger.info("scattering-model: finished computation")
 
     def load_parameters(self):
         nd = self.vmesh.nondim
@@ -49,7 +50,7 @@ class FastSpectral(BaseScatteringModel):
             / (pow(2.0, 2 - omega + alpha) * gamma(2.5 - omega) * np.pi)
         )
         self._omega = omega
-        print("Kn: ", 1.0 / invKn)
+        logger.info("Kn: ", 1.0 / invKn)
 
         # spherical quadrature for integration on sphere
         self._ssrule = self._cfg.lookup("spherical_rule")
@@ -131,7 +132,6 @@ class FastSpectral(BaseScatteringModel):
         mnshape = (self._M, self._Nrho, *shape)
         fft3 = lambda f: torch.fft.fftn(f, norm="ortho", dim=(-3, -2, -1))
         ifft3 = lambda f: torch.fft.ifftn(f, norm="ortho", dim=(-3, -2, -1))
-        pex = lambda *args: print(*args, sep="\n") + exit(0)
 
         # compute forward FFT of f | Ftf = fft(f)
         Ftf = fft3(f0.reshape(shape))

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import torch
+from loguru import logger
 
 from edgfs2D.plugins.base import BasePlugin
 from edgfs2D.solvers.base import BaseSolver
@@ -23,11 +24,11 @@ class ResidualPlugin(BasePlugin):
 
         if time.should_output(self._nsteps):
 
-            print(f"residual at t = {time.time: 0.6g}")
+            logger.info(f"residual at t = {time.time: 0.6g}")
             for i, (curr, prev) in enumerate(
                 zip(solver.curr_fields, solver.prev_fields)
             ):
-                print(
+                logger.info(
                     f"field: {i}, norm: ",
                     sum(
                         torch.dist(c, p)
