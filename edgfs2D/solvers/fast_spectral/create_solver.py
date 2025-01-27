@@ -113,12 +113,14 @@ class FastSpectralSolver(BaseSolver, MomentMixin):
 
     @override
     def write(self, path: Path):
-        self._fs.write(path, FieldData({"u": self.curr_fields[0]}))
+        writer = self._fs.write_metadata(path)
+        writer.write_fields(FieldData({"u": self.curr_fields[0]}))
 
     @override
     def write_moment(self, path: Path):
         soln = self.curr_fields[0]
         fields = self._moments.fields
+        writer = self._fs.write_metadata(path)
 
         moments = FieldData()
         for shape in soln.keys():
@@ -128,4 +130,4 @@ class FastSpectralSolver(BaseSolver, MomentMixin):
             field = FieldData()
             for shape in moments.keys():
                 field[shape] = moments[shape][..., id]
-            self._fs.write(path, FieldData({name: field}))
+            writer.write_fields(FieldData({name: field}))

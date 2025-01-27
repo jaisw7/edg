@@ -209,8 +209,8 @@ class DgField(object, metaclass=ABCMeta):
 
         out[shape].add_(basis.lift(uf[shape]))
 
-    def write(self, path: Path, data: FieldData):
+    def write_metadata(self, path: Path):
         writer = H5FieldWriter(path)
-        writer.write_fields(data)
         writer.write_metadata("uuid", self.dgmesh.uuid)
         writer.write_metadata("time", self.dgmesh.time.time)
+        return writer

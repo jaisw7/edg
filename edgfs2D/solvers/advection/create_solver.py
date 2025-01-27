@@ -101,4 +101,5 @@ class AdvSolver(BaseSolver):
 
     @override
     def write(self, path: Path):
-        self._advf.write(path, FieldData({"u": self._u1}))
+        writer = self._advf.write_metadata(path)
+        writer.write_fields(FieldData({"u": self.curr_fields[0]}))
