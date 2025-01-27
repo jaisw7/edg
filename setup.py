@@ -83,8 +83,9 @@ extras_require = {}
 
 # Scripts
 console_scripts = [
-    "edgfsAdv2D = edgfs2D.solvers.advection.advection:__main__",
-    "edgfsFs2D = edgfs2D.solvers.fast_spectral.fast_spectral:__main__",
+    "edgfsAdv2D = edgfs2D.solvers.advection.main:__main__",
+    "edgfsFs2D = edgfs2D.solvers.fast_spectral.main:__main__",
+    "edgfsPost2D = edgfs2D.post_process.main:__main__",
 ]
 
 # Info

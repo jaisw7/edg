@@ -4,6 +4,7 @@ import os
 from argparse import ArgumentParser, FileType
 
 from edgfs2D.utils.dictionary import Dictionary
+from edgfs2D.utils.util import split_vargs
 
 
 def initialize():
@@ -49,20 +50,7 @@ def initialize():
 
     # Invoke the process method
     if hasattr(args, "process_run") or hasattr(args, "process_restart"):
-        vars = {}
-        for key, value in args.v:
-            keyscope = key.split("::")
-            child = None
-            parent = vars
-            while keyscope:
-                child = keyscope.pop(0)
-                if not parent or child not in parent:
-                    parent[child] = dict()
-                if keyscope:
-                    parent = parent[child]
-                else:
-                    parent[child] = value
-        inp = Dictionary.load(args.inp, defaults=vars)
+        inp = Dictionary.load(args.inp, defaults=split_vargs(args.v))
         return inp, args
     else:
         ap.print_help()

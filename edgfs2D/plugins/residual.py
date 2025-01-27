@@ -29,7 +29,8 @@ class ResidualPlugin(BasePlugin):
                 zip(solver.curr_fields, solver.prev_fields)
             ):
                 logger.info(
-                    f"field: {i}, norm: ",
+                    "field: {}, norm: {}",
+                    i,
                     sum(
                         torch.dist(c, p)
                         for c, p in zip(curr.values(), prev.values())

@@ -1,4 +1,4 @@
-from functools import cached_property
+from functools import cached_property, reduce
 
 import numpy as np
 import torch
@@ -6,7 +6,7 @@ from typing_extensions import override
 
 from edgfs2D.basis.base import BaseBasis, get_basis_for_shape
 from edgfs2D.proto.sbp_pb2 import SBP
-from edgfs2D.quadratures.jacobi import ortho_basis_at
+from edgfs2D.quadratures.jacobi import ortho_basis_at, tri_northo_basis
 from edgfs2D.utils.dictionary import Dictionary
 from edgfs2D.utils.util import torch_map
 
@@ -274,3 +274,36 @@ class FernandezHickenZingg(BaseBasis):
             .item()
             / 4
         )
+
+    def rstoab(self, r, s):
+        VSMALL = 1e-15
+        a = 2 * (1.0 + r) / (1.0 - s + VSMALL) - 1.0
+        return a, s
+
+    def basis(self, r, s):
+        p = self.degree
+        B = np.zeros((int((p + 1) * (p + 2) / 2), len(r)))
+        a, b = self.rstoab(r, s)
+
+        k = 0
+        for i in range(p + 1):
+            for j in range(p - i + 1):
+                B[k, :] = tri_northo_basis(a, b, i, j).ravel()
+                k += 1
+        return B
+
+    @cached_property
+    def vdm(self):
+        return self.basis(self._qz[:, 0], self._qz[:, 1]).T
+
+    @override
+    def interpolation_op(self, nodes: np.ndarray):
+        V = self.vdm
+        mul = lambda *args: reduce(np.matmul, args)
+        Fwd = mul(np.linalg.inv(mul(V.T, self._H, V)), V.T, self._H)
+        Vr = self.basis(nodes[:, 0], nodes[:, 1]).T
+        return mul(Vr, Fwd)
+
+    @override
+    def interpolate(self, element_data: np.ndarray, interp_op: np.ndarray):
+        return np.tensordot(interp_op, element_data, axes=1)

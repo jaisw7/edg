@@ -106,6 +106,17 @@ class BaseBasis(object, metaclass=ABCMeta):
         """Given error at element solution points, compute jacobian weighted error"""
         pass
 
+    @abstractmethod
+    def interpolation_op(self, nodes: np.ndarray):
+        """Compute interpolation operators at the location of given nodes.
+        Note: The nodes must lie within the basis element"""
+        pass
+
+    @abstractmethod
+    def interpolate(self, element_data: np.ndarray, interp_op: np.ndarray):
+        """Given element_data and interpolation operator, compute interpolated solition"""
+        pass
+
 
 class StoredBasis(object):
     @classmethod

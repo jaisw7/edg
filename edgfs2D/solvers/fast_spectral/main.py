@@ -8,12 +8,12 @@ import numpy as np
 import torch
 
 from edgfs2D.distribution_mesh.dgdist_mesh import DgDistMesh
-from edgfs2D.initialize import initialize
 from edgfs2D.integrators import get_integrator
 from edgfs2D.physical_mesh.dg_mesh import DgMesh
 from edgfs2D.physical_mesh.nondim_mesh import NondimMesh
 from edgfs2D.solvers.fast_spectral.create_solver import FastSpectralSolver
 from edgfs2D.solvers.fast_spectral.nondim import NondimParams
+from edgfs2D.solvers.initialize import initialize
 from edgfs2D.time.physical_time import PhysicalTime
 from edgfs2D.velocity_mesh import get_velocity_mesh
 

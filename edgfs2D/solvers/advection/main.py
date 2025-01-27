@@ -7,11 +7,11 @@ Entropy Stable discontinous galerkin solver for advection equation
 import numpy as np
 import torch
 
-from edgfs2D.initialize import initialize
 from edgfs2D.integrators import get_integrator
 from edgfs2D.physical_mesh.dg_mesh import DgMesh
 from edgfs2D.physical_mesh.primitive_mesh import PrimitiveMesh
 from edgfs2D.solvers.advection.create_solver import AdvSolver
+from edgfs2D.solvers.initialize import initialize
 from edgfs2D.time.physical_time import PhysicalTime
 
 

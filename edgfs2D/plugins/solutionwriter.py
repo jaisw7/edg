@@ -33,5 +33,5 @@ class SolutionWriterPlugin(BasePlugin):
             logger.info(
                 "written solution in directory {} at time {}",
                 self._basedir,
-                "{time.time:0.6g}",
+                f"{time.time:0.6g}",
             )

@@ -31,3 +31,4 @@ __pycache__
 
 edgfs2D/proto/*_pb2.py
 log
+*.vtu

@@ -75,6 +75,66 @@ def jac_nodal_basis_at(order, pts, epts):
     )
 
 
+def njacobi1(n, a, b, z):
+    j0 = np.ones_like(z) * np.sqrt(
+        pow(2, -a - b - 1) * gamma(a + b + 2) / gamma(a + 1) / gamma(b + 1)
+    )
+    j1 = j0
+
+    if n >= 1:
+        j1 = (
+            0.5
+            * j0
+            * np.sqrt((a + b + 3) / (a + 1) / (b + 1))
+            * ((a + b + 2) * z + (a - b))
+        )
+
+    if n >= 2:
+        for q in range(2, n + 1):
+            c1 = (
+                2.0
+                / (2 * (q - 1) + a + b)
+                * np.sqrt(
+                    (q - 1)
+                    * ((q - 1) + a + b)
+                    * ((q - 1) + a)
+                    * ((q - 1) + b)
+                    / (2 * (q - 1) + a + b - 1)
+                    / (2 * (q - 1) + a + b + 1)
+                )
+            )
+            c2 = (
+                2.0
+                / (2 * (q) + a + b)
+                * np.sqrt(
+                    (q)
+                    * ((q) + a + b)
+                    * ((q) + a)
+                    * ((q) + b)
+                    / (2 * (q) + a + b - 1)
+                    / (2 * (q) + a + b + 1)
+                )
+            )
+            c3 = (
+                -(a**2 - b**2)
+                / (2 * (q - 1) + a + b)
+                / (2 * (q - 1) + a + b + 2)
+            )
+            j2 = (j1 * (z - c3) - c1 * j0) / c2
+            j0, j1 = j1, j2
+
+    return j1
+
+
+def tri_northo_basis(a, b, i, j):
+    return (
+        np.sqrt(2.0)
+        * njacobi1(i, 0.0, 0.0, a)
+        * njacobi1(j, 2 * i + 1, 0.0, b)
+        * ((1 - b) ** i)
+    )
+
+
 """Computation of gauss quadratures via eigenvalue decomposition.
 Ref: Orthogonal Polynomials: Computation and Approximation, Walter Gautschi"""
 

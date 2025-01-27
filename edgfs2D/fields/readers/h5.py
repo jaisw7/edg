@@ -5,6 +5,7 @@ import h5py
 from typing_extensions import override
 
 from edgfs2D.fields.readers.base import BaseFieldReader
+from edgfs2D.fields.types import Shape
 
 
 class H5FieldReader(BaseFieldReader):
@@ -19,3 +20,13 @@ class H5FieldReader(BaseFieldReader):
     def read_metadata(self, key):
         with h5py.File(self._path, self.mode) as h5f:
             return h5f.attrs.get(key)
+
+    @override
+    def read_field_names(self):
+        with h5py.File(self._path, self.mode) as h5f:
+            return [str(key) for key in h5f.keys()]
+
+    @override
+    def read_field_data(self, fieldname: str, shape: Shape):
+        with h5py.File(self._path, self.mode) as h5f:
+            return h5f[fieldname][shape][:]
