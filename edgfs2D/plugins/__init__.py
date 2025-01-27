@@ -3,6 +3,7 @@ import re
 
 from edgfs2D.plugins.base import BasePlugin
 from edgfs2D.plugins.exacterror import ExactErrorPlugin
+from edgfs2D.plugins.momentwriter import MomentWriterPlugin
 from edgfs2D.plugins.nancheck import NanCheckPlugin
 from edgfs2D.plugins.residual import ResidualPlugin
 from edgfs2D.plugins.solutionwriter import SolutionWriterPlugin

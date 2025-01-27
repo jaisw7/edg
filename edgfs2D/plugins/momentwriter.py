@@ -10,11 +10,11 @@ from edgfs2D.solvers.base import BaseSolver
 from edgfs2D.utils.dictionary import SubDictionary
 
 
-class SolutionWriterPlugin(BasePlugin):
-    kind = "solutionwriter"
-    allowed_solvers = ["AdvSolver", "FastSpectralSolver"]
+class MomentWriterPlugin(BasePlugin):
+    kind = "momentwriter"
+    allowed_solvers = ["FastSpectralSolver"]
 
-    """Write current solution fields for the solver"""
+    """Write moments for the solver"""
 
     def __init__(self, cfg: SubDictionary, solver: BaseSolver):
         super().__init__(cfg, solver)
@@ -29,9 +29,9 @@ class SolutionWriterPlugin(BasePlugin):
             filename = self._basedir.joinpath(
                 self._basename.format(t=time.time)
             )
-            self._solver.write(filename)
+            self._solver.write_moment(filename)
             logger.info(
-                "written solution in directory {} at time {}",
+                "written moment in directory {} at time {}",
                 self._basedir,
-                "{time.time:0.6g}",
+                f"{time.time:0.6g}",
             )

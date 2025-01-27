@@ -8,7 +8,7 @@ from edgfs2D.fields.writers.base import BaseFieldWriter
 
 
 class H5FieldWriter(BaseFieldWriter):
-    mode = "w"
+    mode = "a"
     extn = ".h5"
 
     def __init__(self, path: Path):
@@ -17,6 +17,10 @@ class H5FieldWriter(BaseFieldWriter):
             if str(path).endswith(self.extn)
             else Path(str(path) + self.extn)
         )
+
+        # clear contents
+        with h5py.File(self._path, "w") as h5f:
+            pass
 
     @override
     def write_metadata(self, key, val):

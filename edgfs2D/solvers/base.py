@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
+from pathlib import Path
 
 from edgfs2D.fields.types import FieldData
 
@@ -29,5 +30,12 @@ class BaseSolver(object, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def write(self):
+    def write(self, path: Path):
+        pass
+
+
+class MomentMixin:
+
+    @abstractmethod
+    def write_moment(self, path: Path):
         pass

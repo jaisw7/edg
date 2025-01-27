@@ -2,6 +2,7 @@ from pathlib import Path
 
 import numpy as np
 import torch
+from typing_extensions import override
 
 from edgfs2D.fields.dgfield import DgField
 from edgfs2D.fields.types import FieldData, FieldDataList
@@ -74,24 +75,30 @@ class AdvSolver(BaseSolver):
 
             time.increment()
 
+    @override
     @property
     def curr_fields(self) -> FieldDataList:
         return [self._u1]
 
+    @override
     @property
     def prev_fields(self) -> FieldDataList:
         return [self._u0]
 
+    @override
     @property
     def time(self) -> PhysicalTime:
         return self._time
 
+    @override
     @property
     def mesh(self) -> DgMesh:
         return self._dgmesh
 
+    @override
     def error_norm(self, err: FieldData):
         return self._advf.error(err)
 
+    @override
     def write(self, path: Path):
-        return self._advf.write(path, FieldData({"u": self._u1}))
+        self._advf.write(path, FieldData({"u": self._u1}))

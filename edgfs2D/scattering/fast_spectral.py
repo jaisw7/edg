@@ -50,7 +50,7 @@ class FastSpectral(BaseScatteringModel):
             / (pow(2.0, 2 - omega + alpha) * gamma(2.5 - omega) * np.pi)
         )
         self._omega = omega
-        logger.info("Kn: ", 1.0 / invKn)
+        logger.info("Kn: {}", 1.0 / invKn)
 
         # spherical quadrature for integration on sphere
         self._ssrule = self._cfg.lookup("spherical_rule")
