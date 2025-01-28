@@ -4,7 +4,6 @@ from typing_extensions import override
 from edgfs2D.entropy_fluxes import get_eflux_by_cls_and_name
 from edgfs2D.entropy_fluxes.base import BaseEntropyFlux
 from edgfs2D.utils.dictionary import SubDictionary
-from edgfs2D.utils.nputil import ndrange
 from edgfs2D.utils.util import torch_map
 
 
@@ -31,9 +30,9 @@ class TwoPointEntropyFlux(AdvEntropyFlux):
     def apply(self, ul: torch.Tensor, ur: torch.Tensor):
         npts = ul.shape[0]
         fs = torch.zeros((2, npts, *ul.shape), dtype=ul.dtype, device=ul.device)
-        for i, j in ndrange(npts, npts):
-            fs[0, i, j, :] = 0.5 * self._velocity[0] * (ul[i, :] + ur[j, :])
-            fs[1, i, j, :] = 0.5 * self._velocity[1] * (ul[i, :] + ur[j, :])
+        for i in range(npts):
+            fs[0, i, ...] = 0.5 * self._velocity[0] * (ul[i, :] + ur)
+            fs[1, i, ...] = 0.5 * self._velocity[1] * (ul[i, :] + ur)
         return fs
 
 

@@ -123,12 +123,12 @@ class DgField(object, metaclass=ABCMeta):
             grad_data[shape] = basis.grad(u[shape], element_jac[shape])
         return grad_data
 
-    def grad_eflux(self, u: FieldData) -> FieldData:
-        grad_data = FieldData()
+    def convect_eflux(self, u: FieldData) -> FieldData:
+        data = FieldData()
         element_jac = self._element_jac_mat
         for shape, basis in self.dgmesh.get_basis_at_shapes.items():
-            grad_data[shape] = basis.grad_eflux(u[shape], element_jac[shape])
-        return grad_data
+            data[shape] = basis.convect_eflux(u[shape], element_jac[shape])
+        return data
 
     def error(self, u: FieldData):
         error_data = {}

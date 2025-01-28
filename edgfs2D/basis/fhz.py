@@ -309,26 +309,21 @@ class FernandezHickenZingg(BaseBasis):
         return np.tensordot(interp_op, element_data, axes=1)
 
     @override
-    def grad_eflux(
+    def convect_eflux(
         self, eflux_data: torch.Tensor, element_jac: torch.Tensor
     ) -> torch.Tensor:
         f1s, f2s = eflux_data[0], eflux_data[1]
         Dr = self.grad_op[0][..., None, None]
         Ds = self.grad_op[1][..., None, None]
 
-        shape = (2, *f1s.shape[1:])
-        gradu = torch.empty(shape, dtype=self.cfg.ttype, device=self.cfg.device)
-
         rx = element_jac[0, ..., 0].unsqueeze(-1)
         ry = element_jac[0, ..., 1].unsqueeze(-1)
         sx = element_jac[1, ..., 0].unsqueeze(-1)
         sy = element_jac[1, ..., 1].unsqueeze(-1)
 
-        gradu[0] = 2 * (
-            rx * (Dr * f1s).sum(axis=1) + sx * (Ds * f1s).sum(axis=1)
+        return 2 * (
+            rx * (Dr * f1s).sum(axis=1)
+            + sx * (Ds * f1s).sum(axis=1)
+            + ry * (Dr * f2s).sum(axis=1)
+            + sy * (Ds * f2s).sum(axis=1)
         )
-        gradu[1] = 2 * (
-            ry * (Dr * f2s).sum(axis=1) + sy * (Ds * f2s).sum(axis=1)
-        )
-
-        return gradu

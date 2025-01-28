@@ -1,4 +1,5 @@
 from pathlib import Path
+from timeit import default_timer as timer
 
 import numpy as np
 import torch
@@ -47,7 +48,7 @@ class AdvSolver(BaseSolver):
 
         if advf.is_eflux_enabled:
             eflux = advf.compute_entropy_flux(u, u)
-            conv = advf.grad_eflux(eflux).sum(dim=0)
+            conv = advf.convect_eflux(eflux)
         else:
             gradu = advf.grad(u)
             conv = advf.convect(gradu)

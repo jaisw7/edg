@@ -118,10 +118,10 @@ class BaseBasis(object, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def grad_eflux(
+    def convect_eflux(
         self, eflux_data: torch.Tensor, element_jac: torch.Tensor
     ) -> torch.Tensor:
-        """Given entropy-flux data and element jacobian, compute gradient"""
+        """Given entropy-flux data and element jacobian, compute convective flux"""
         pass
 
 
