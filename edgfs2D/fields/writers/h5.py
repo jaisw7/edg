@@ -33,4 +33,4 @@ class H5FieldWriter(BaseFieldWriter):
             for key, val in data.items():
                 group = h5f.create_group(key)
                 for shape, soln in val.items():
-                    group.create_dataset(shape, data=soln.numpy())
+                    group.create_dataset(shape, data=soln.cpu().numpy())

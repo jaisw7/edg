@@ -1,6 +1,5 @@
 from functools import lru_cache
 
-import numpy as np
 import torch
 from loguru import logger
 
@@ -66,7 +65,7 @@ class Moments:
         cy = cv[1, :].reshape((1, 1, Nv)) - ele_sol[:, :, 2].reshape(
             (Nqr, Ne, 1)
         )
-        cz = cv[2, :].reshape((1, 1, Nv)) - np.zeros((Nqr, Ne, 1))
+        cz = cv[2, :].reshape((1, 1, Nv)) - torch.zeros((Nqr, Ne, 1))
         cSqr = cx * cx + cy * cy + cz * cz
 
         # non-dimensional temperature
@@ -95,7 +94,7 @@ class Moments:
         )
 
         # dimensional rho, ux, uy, T, qx, qy, Pxx, Pyy, Pxy
-        ele_sol[:, :, 0:9] *= np.array(
+        ele_sol[:, :, 0:9] *= torch.Tensor(
             [
                 rho0,
                 u0,
