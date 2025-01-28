@@ -42,12 +42,23 @@ class AdvSolver(BaseSolver):
         else:
             self._advf.apply_initial_condition(self._u1)
 
+    def eval_derivate(self, u: FieldData):
+        advf = self._advf
+
+        if advf.is_eflux_enabled:
+            eflux = advf.compute_entropy_flux(u, u)
+            conv = advf.grad_eflux(eflux).sum(dim=0)
+        else:
+            gradu = advf.grad(u)
+            conv = advf.convect(gradu)
+
+        return conv
+
     def rhs(self, curr_time: torch.float64, u: FieldData):
         advf = self._advf
 
         # compute convective derivative
-        gradu = advf.grad(u)
-        conv = advf.convect(gradu)
+        conv = self.eval_derivate(u)
         conv.mul_(-1)
 
         # traces at boundaries

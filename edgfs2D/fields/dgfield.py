@@ -7,6 +7,7 @@ import torch
 from typing_extensions import Dict
 
 from edgfs2D.boundary_conditions.base import BaseBoundaryCondition
+from edgfs2D.entropy_fluxes.base import BaseEntropyFlux
 from edgfs2D.fields.readers.h5 import H5FieldReader
 from edgfs2D.fields.types import FieldData, FieldDataTuple, Shape
 from edgfs2D.fields.writers.h5 import H5FieldWriter
@@ -122,6 +123,13 @@ class DgField(object, metaclass=ABCMeta):
             grad_data[shape] = basis.grad(u[shape], element_jac[shape])
         return grad_data
 
+    def grad_eflux(self, u: FieldData) -> FieldData:
+        grad_data = FieldData()
+        element_jac = self._element_jac_mat
+        for shape, basis in self.dgmesh.get_basis_at_shapes.items():
+            grad_data[shape] = basis.grad_eflux(u[shape], element_jac[shape])
+        return grad_data
+
     def error(self, u: FieldData):
         error_data = {}
         element_jac_det = self._element_jac_det
@@ -170,6 +178,14 @@ class DgField(object, metaclass=ABCMeta):
     ):
         for key in ul.keys():
             flux.apply(ul[key], ur[key], nl[key])
+
+    def _compute_entropy_flux(
+        self, ul: FieldData, ur: FieldData, eflux: BaseEntropyFlux
+    ) -> FieldData:
+        data = FieldData()
+        for key in ul.keys():
+            data[key] = eflux.apply(ul[key], ur[key])
+        return data
 
     def _convect(self, gradu: FieldData, velocity: torch.Tensor) -> FieldData:
         data = FieldData()

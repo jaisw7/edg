@@ -38,24 +38,28 @@ class FieldData(Dict[Shape, torch.Tensor]):
         for shape in src.keys():
             self.get(shape).copy_(src[shape])
 
-    def clone(self):
+    def unary_return(self, funcName: str, *args, **kwargs) -> FieldData:
         dest = FieldData()
         for shape, value in self.items():
-            dest[shape] = value.clone()
+            dest[shape] = getattr(value, funcName)(*args, **kwargs)
         return dest
+
+    def clone(self, *args, **kwargs):
+        return self.unary_return("clone", *args, **kwargs)
+
+    def sum(self, *args, **kwargs):
+        return self.unary_return("sum", *args, **kwargs)
 
     def clone_as_zeros(self):
         return FieldData.zeros_like(self)
 
     """Inline operators"""
 
-    def unary_apply_(self, funcName: str, *args, **kwargs) -> FieldData:
+    def unary_apply_(self, funcName: str, *args, **kwargs):
         for shape, value in self.items():
             getattr(value, funcName)(*args, **kwargs)
 
-    def binary_apply_(
-        self, funcName: str, other: FieldData, *args, **kwargs
-    ) -> FieldData:
+    def binary_apply_(self, funcName: str, other: FieldData, *args, **kwargs):
         for shape, value in self.items():
             getattr(value, funcName)(other[shape], *args, **kwargs)
 

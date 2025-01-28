@@ -117,6 +117,13 @@ class BaseBasis(object, metaclass=ABCMeta):
         """Given element_data and interpolation operator, compute interpolated solition"""
         pass
 
+    @abstractmethod
+    def grad_eflux(
+        self, eflux_data: torch.Tensor, element_jac: torch.Tensor
+    ) -> torch.Tensor:
+        """Given entropy-flux data and element jacobian, compute gradient"""
+        pass
+
 
 class StoredBasis(object):
     @classmethod
