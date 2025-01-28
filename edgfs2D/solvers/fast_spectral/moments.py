@@ -65,7 +65,9 @@ class Moments:
         cy = cv[1, :].reshape((1, 1, Nv)) - ele_sol[:, :, 2].reshape(
             (Nqr, Ne, 1)
         )
-        cz = cv[2, :].reshape((1, 1, Nv)) - torch.zeros((Nqr, Ne, 1))
+        cz = cv[2, :].reshape((1, 1, Nv)) - torch.zeros(
+            (Nqr, Ne, 1), dtype=soln.dtype, device=soln.device
+        )
         cSqr = cx * cx + cy * cy + cz * cz
 
         # non-dimensional temperature
@@ -105,7 +107,9 @@ class Moments:
                 0.5 * rho0 * (u0**2),
                 0.5 * rho0 * (u0**2),
                 0.5 * rho0 * (u0**2),
-            ]
+            ],
+            dtype=soln.dtype,
+            device=soln.device,
         ).reshape(1, 1, 9)
 
         # dimensional pressure
