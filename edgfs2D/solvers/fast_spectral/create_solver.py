@@ -31,9 +31,6 @@ class FastSpectralSolver(BaseSolver, MomentMixin):
         self._intg = intg
         self._fs = FsField(cfg, distmesh)
 
-        # load plugins
-        self._time.load_plugins(self)
-
         # tensors for storage of solutions
         self._u0 = self._fs.create_new_field()
         self._u1 = self._fs.create_new_field()
@@ -49,6 +46,9 @@ class FastSpectralSolver(BaseSolver, MomentMixin):
 
         # moments
         self._moments = Moments(self._distmesh.vmesh)
+
+        # load plugins
+        self._time.load_plugins(self)
 
     def rhs(self, curr_time: torch.float64, u: FieldData):
         fs = self._fs

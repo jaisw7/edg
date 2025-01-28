@@ -33,7 +33,7 @@ class LaxFriedrichsFlux(FastSpectralFlux):
         # As per Hasthaven pp. 170, Ch. 6
         dim = nl.shape[1]
         nu = torch.tensordot(nl, self._velocity[:dim, :], dims=1)
-        C = nu.abs().max()
+        C = nu.abs()
         flux = 0.5 * (nu * (ul + ur) + C * (ul - ur))
 
         # update flux on left interface

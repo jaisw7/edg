@@ -23,9 +23,8 @@ class EulerIntegrator(BaseIntegrator):
         self, step: int, time: PhysicalTime, u: FieldData, rhs: RhsFunction
     ) -> FieldData:
         rhs_val = rhs(time.time, u)
-        u_new = FieldData()
 
         for shape in u.keys():
-            u_new[shape] = u[shape] + time.dt * rhs_val[shape]
+            rhs_val[shape].mul_(time.dt).add_(u[shape])
 
-        return u_new
+        return rhs_val

@@ -100,11 +100,11 @@ class MaxwellianInitialCondition(FastSpectralInitialCondition):
         ):
             logger.info("Bulk properties not conserved!")
             logger.info("Calculated bulk properties based on provided inputs:")
-            logger.info("mass-density:", self._rhoini * rho0, ele_sol[0] * rho0)
-            logger.info("x-velocity:", self._uini[0, 0] * u0, ele_sol[1] * u0)
-            logger.info("y-velocity:", self._uini[1, 0] * u0, ele_sol[2] * u0)
-            logger.info("z-velocity:", self._uini[2, 0] * u0, ele_sol[3] * u0)
-            logger.info("temperature:", self._Tini * T0, ele_sol[4] * T0)
+            logger.info("density {}", self._rhoini * rho0, ele_sol[0] * rho0)
+            logger.info("x-velocity {}", self._uini[0, 0] * u0, ele_sol[1] * u0)
+            logger.info("y-velocity {}", self._uini[1, 0] * u0, ele_sol[2] * u0)
+            logger.info("z-velocity {}", self._uini[2, 0] * u0, ele_sol[3] * u0)
+            logger.info("temperature: {}", self._Tini * T0, ele_sol[4] * T0)
             raise ValueError("Check velocity mesh parameters")
 
     @override

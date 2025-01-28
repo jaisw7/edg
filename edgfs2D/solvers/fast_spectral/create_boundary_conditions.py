@@ -79,14 +79,15 @@ class DiffuseWallBoundaryCondition(FastSpectralBoundaryCondition):
         ul: torch.Tensor,
     ):
         pos_id, neg_id, pos_val, neg_val = self.trace_ids
-        f0 = self._f0
 
         # compute number density
-        nden = (pos_val * ul).sum(axis=1) / neg_val
+        nden = (pos_val * ul).sum(axis=1) / (-neg_val)
+        # print(self.nodes[0, :], nden)
 
         # update flux
         ur = pos_id * ul
-        ur.add_(torch.outer(nden, neg_id * f0))
+        ur.add_(torch.outer(nden, neg_id * self._f0))
+
         return ur
 
 

@@ -49,7 +49,7 @@ class Moments:
         ele_sol[..., 0] = soln.sum(dim=-1) * mcw
 
         if torch.any(torch.lt(ele_sol[..., 0], 1e-10)):
-            logger.warn("density below 1e-10")
+            raise RuntimeError("density below 1e-10")
             return
 
         # non-dimensional velocities

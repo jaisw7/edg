@@ -20,12 +20,13 @@ class MomentWriterPlugin(BasePlugin):
         super().__init__(cfg, solver)
         self._nsteps = super().get_nsteps()
         self._basedir, self._basename = super().get_basename()
+        self.__call__()
 
     def __call__(self):
         time = self._solver.time
         solver = self._solver
 
-        if time.should_output(self._nsteps):
+        if time.step == 0 or time.should_output(self._nsteps):
             filename = self._basedir.joinpath(
                 self._basename.format(t=time.time)
             )
