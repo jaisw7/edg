@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import hashlib
 import re
 from collections import defaultdict
 
@@ -56,8 +57,12 @@ class GmshReader(BaseReader):
     _nodemaps = GmshNodeMaps
 
     def __init__(self, msh):
-        if isinstance(msh, str):
-            msh = open(msh)
+        # compute uuid
+        hasher = hashlib.new("sha256")
+        with open(msh.name, "rb") as f:
+            while chunk := f.read():
+                hasher.update(chunk)
+        self._uuid = hasher.hexdigest()
 
         # Get an iterator over the lines of the mesh
         mshit = iter(msh)
@@ -242,4 +247,5 @@ class GmshReader(BaseReader):
         rawm = {}
         rawm.update(mesh.get_connectivity())
         rawm.update(mesh.get_shape_points())
+        rawm.update({"mesh_uuid": self._uuid})
         return rawm

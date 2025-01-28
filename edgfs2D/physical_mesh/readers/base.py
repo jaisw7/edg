@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import uuid
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from itertools import chain
@@ -23,7 +22,7 @@ class BaseReader(object, metaclass=ABCMeta):
         mesh = self._to_raw()
 
         # Add metadata
-        mesh["mesh_uuid"] = np.array(str(uuid.uuid4()), dtype="S")
+        mesh["mesh_uuid"] = np.array(str(mesh["mesh_uuid"]), dtype="S")
 
         return mesh
 
@@ -170,7 +169,8 @@ class NodalMeshAssembler(object):
 
         # Flattern the face-pair dicts
         pairs = chain(
-            chain.from_iterable(fpairs.values()), chain.from_iterable(pfpairs.values())
+            chain.from_iterable(fpairs.values()),
+            chain.from_iterable(pfpairs.values()),
         )
 
         # Generate the internal connectivity array

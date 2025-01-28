@@ -23,6 +23,10 @@ class VtuPostProcessor(BasePostProcessor):
     def execute(self):
         time = self.dgmesh.pmesh.time
         vtufilename = time.args.soln.with_suffix(self.extn)
+        reader = H5FieldReader(time.args.soln)
+
+        if self.dgmesh.uuid != reader.read_metadata("uuid"):
+            raise RuntimeError("soln not computed on the provided mesh")
 
         with open(vtufilename, "wb") as f:
             writeln = lambda s: f.write((s + "\n").encode("utf-8"))
@@ -108,15 +112,6 @@ class VtuPostProcessor(BasePostProcessor):
         # write piece footer
         writeln(rf"</Piece>")
 
-    def _chunk_it(self, array, n):
-        for start in range(0, len(array), n):
-            yield array[start : start + n]
-
-    def text_writer_uncompressed(self, writeln, data):
-        data_bytes = data.tobytes()
-        header = np.array(len(data_bytes), dtype=np.uint32)
-        writeln(base64.b64encode(header.tobytes() + data_bytes).decode())
-
     def text_writer_compressed(self, writeln, data):
         max_block_size = 32768
         data_bytes = data.tobytes()
@@ -126,8 +121,8 @@ class VtuPostProcessor(BasePostProcessor):
         last_block_size = len(data_bytes) - (num_blocks - 1) * max_block_size
 
         compressed_blocks = [
-            zlib.compress(block)
-            for block in self._chunk_it(data_bytes, max_block_size)
+            zlib.compress(data_bytes[v : v + max_block_size])
+            for v in range(0, len(data_bytes), max_block_size)
         ]
 
         # collect header
