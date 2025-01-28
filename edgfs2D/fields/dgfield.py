@@ -7,6 +7,7 @@ import torch
 from typing_extensions import Dict
 
 from edgfs2D.boundary_conditions.base import BaseBoundaryCondition
+from edgfs2D.fields.readers.h5 import H5FieldReader
 from edgfs2D.fields.types import FieldData, FieldDataTuple, Shape
 from edgfs2D.fields.writers.h5 import H5FieldWriter
 from edgfs2D.fluxes.base import BaseFlux
@@ -33,10 +34,14 @@ class DgField(object, metaclass=ABCMeta):
         )
 
     def _to_device(self, data: FieldData):
-        return {
-            shape: to_torch(d).to(dtype=self.cfg.ttype, device=self.cfg.device)
-            for shape, d in data.items()
-        }
+        return FieldData(
+            {
+                shape: to_torch(d).to(
+                    dtype=self.cfg.ttype, device=self.cfg.device
+                )
+                for shape, d in data.items()
+            }
+        )
 
     def _to_device_interfaces(self, data: FieldData):
         return {
@@ -214,3 +219,7 @@ class DgField(object, metaclass=ABCMeta):
         writer.write_metadata("uuid", self.dgmesh.uuid)
         writer.write_metadata("time", self.dgmesh.time.time)
         return writer
+
+    def read_field(self, path: Path, field_name: str) -> FieldData:
+        reader = H5FieldReader(path)
+        return self._to_device(reader.read_field(field_name))

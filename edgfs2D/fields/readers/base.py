@@ -19,5 +19,9 @@ class BaseFieldReader(object, metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def read_field(self, fieldname: str):
+        pass
+
+    @abstractmethod
     def read_field_data(self, fieldname: str, shape: Shape):
         pass

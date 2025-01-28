@@ -2,6 +2,7 @@
 
 import os
 from argparse import ArgumentParser, FileType
+from pathlib import Path
 
 from edgfs2D.utils.dictionary import Dictionary
 from edgfs2D.utils.util import split_vargs
@@ -20,7 +21,7 @@ def initialize():
         nargs=2,
         action="append",
         default=[],
-        help="substitute variables. Example: -v mesh::Nv 32",
+        help="substitute variables. Example: -v basis-tri::degree 2",
     )
     ap_run.set_defaults(process_run=True)
 
@@ -28,20 +29,13 @@ def initialize():
     ap_restart = sp.add_parser("restart", help="restart --help")
     ap_restart.add_argument("inp", type=FileType("r"), help="input file")
     ap_restart.add_argument("mesh", type=FileType("r"), help="input mesh file")
-    ap_restart.add_argument(
-        "dist",
-        nargs="+",
-        action="append",
-        type=FileType("r"),
-        default=[],
-        help="sorted list of distributions",
-    )
+    ap_restart.add_argument("soln", type=Path, help="input soln file")
     ap_restart.add_argument(
         "-v",
         nargs=2,
         action="append",
         default=[],
-        help="substitute variables. Example: -v mesh::Nv 32",
+        help="substitute variables. Example: -v basis-tri::degree 2",
     )
     ap_restart.set_defaults(process_restart=True)
 

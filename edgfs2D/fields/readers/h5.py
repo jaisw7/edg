@@ -27,6 +27,11 @@ class H5FieldReader(BaseFieldReader):
             return [str(key) for key in h5f.keys()]
 
     @override
+    def read_field(self, fieldname: str):
+        with h5py.File(self._path, self.mode) as h5f:
+            return {shape: data[:] for shape, data in h5f[fieldname].items()}
+
+    @override
     def read_field_data(self, fieldname: str, shape: Shape):
         with h5py.File(self._path, self.mode) as h5f:
             return h5f[fieldname][shape][:]

@@ -17,6 +17,7 @@ from edgfs2D.utils.dictionary import Dictionary
 
 
 class FastSpectralSolver(BaseSolver, MomentMixin):
+    field_name = "u"
 
     def __init__(
         self,
@@ -38,7 +39,10 @@ class FastSpectralSolver(BaseSolver, MomentMixin):
         self._u1 = self._fs.create_new_field()
 
         # apply initial condition
-        self._fs.apply_initial_condition(self._u1)
+        if time.is_restart:
+            self._u1 = self._fs.read_field(time.args.soln, self.field_name)
+        else:
+            self._fs.apply_initial_condition(self._u1)
 
         # scattering model
         self._sm = get_scattering_model(cfg, distmesh.vmesh)
@@ -114,7 +118,7 @@ class FastSpectralSolver(BaseSolver, MomentMixin):
     @override
     def write(self, path: Path):
         writer = self._fs.write_metadata(path)
-        writer.write_fields(FieldData({"u": self.curr_fields[0]}))
+        writer.write_fields(FieldData({self.field_name: self.curr_fields[0]}))
 
     @override
     def write_moment(self, path: Path):

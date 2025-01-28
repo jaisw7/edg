@@ -78,8 +78,8 @@ class PhysicalTime(object):
 
     def _define_start_time(self):
         if self.is_restart:
-            path = Path(args.dist[0].name)
-            return H5FieldReader(path).get_metadata("time")
+            path = Path(self.args.soln)
+            return H5FieldReader(path).read_metadata("time")
         else:
             return self._cfg.lookupfloat("tstart")
 

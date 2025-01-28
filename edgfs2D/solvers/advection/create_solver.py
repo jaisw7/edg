@@ -15,6 +15,7 @@ from edgfs2D.utils.dictionary import Dictionary
 
 
 class AdvSolver(BaseSolver):
+    field_name = "u"
 
     def __init__(
         self,
@@ -36,7 +37,10 @@ class AdvSolver(BaseSolver):
         self._u1 = self._advf.create_new_field()
 
         # apply initial condition
-        self._advf.apply_initial_condition(self._u1)
+        if time.is_restart:
+            self._u1 = self._advf.read_field(time.args.soln, self.field_name)
+        else:
+            self._advf.apply_initial_condition(self._u1)
 
     def rhs(self, curr_time: torch.float64, u: FieldData):
         advf = self._advf
@@ -102,4 +106,4 @@ class AdvSolver(BaseSolver):
     @override
     def write(self, path: Path):
         writer = self._advf.write_metadata(path)
-        writer.write_fields(FieldData({"u": self.curr_fields[0]}))
+        writer.write_fields(FieldData({self.field_name: self.curr_fields[0]}))
