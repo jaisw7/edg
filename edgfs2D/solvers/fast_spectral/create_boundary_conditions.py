@@ -82,7 +82,6 @@ class DiffuseWallBoundaryCondition(FastSpectralBoundaryCondition):
 
         # compute number density
         nden = (pos_val * ul).sum(axis=1) / (-neg_val)
-        # print(self.nodes[0, :], nden)
 
         # update flux
         ur = pos_id * ul
