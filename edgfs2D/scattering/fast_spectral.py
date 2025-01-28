@@ -99,7 +99,7 @@ class FastSpectral(BaseScatteringModel):
             l[0, idv] = l0[I]
             l[1, idv] = l0[J]
             l[2, idv] = l0[K]
-        self._l = torch.from_numpy(l).to(device=self._cfg.device)
+        self._l = to_torch_device(l, self._cfg)
 
         # precompute aa
         fac = torch.pi / L / 2

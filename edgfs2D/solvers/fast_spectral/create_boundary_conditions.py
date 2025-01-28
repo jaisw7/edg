@@ -1,5 +1,6 @@
 from functools import cached_property
 
+import numpy as np
 import torch
 from typing_extensions import override
 
@@ -38,7 +39,9 @@ class FastSpectralBoundaryCondition(BaseBoundaryCondition):
 
     @cached_property
     def vweights(self):
-        assert isinstance(self._vmesh.weights, self._cfg.dtype), "needs scalar"
+        assert isinstance(
+            self._vmesh.weights, (np.float32, np.float64)
+        ), "needs scalar"
         return self._vmesh.weights
 
 

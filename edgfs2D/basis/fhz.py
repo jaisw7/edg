@@ -8,7 +8,7 @@ from edgfs2D.basis.base import BaseBasis, get_basis_for_shape
 from edgfs2D.proto.sbp_pb2 import SBP
 from edgfs2D.quadratures.jacobi import ortho_basis_at, tri_northo_basis
 from edgfs2D.utils.dictionary import Dictionary
-from edgfs2D.utils.util import torch_map
+from edgfs2D.utils.util import to_torch_device, torch_map
 
 
 # The nodal DG due to D. Del Rey Fernández, J. Hicken, and D. Zingg.
@@ -218,7 +218,7 @@ class FernandezHickenZingg(BaseBasis):
 
     @cached_property
     def grad_op(self):
-        return torch.from_numpy(self._D).to(self.cfg.device)
+        return to_torch_device(self._D, self.cfg)
 
     @override
     def grad(
@@ -250,7 +250,7 @@ class FernandezHickenZingg(BaseBasis):
 
     @cached_property
     def lift_op(self):
-        return torch.from_numpy(self._L).to(self.cfg.device)
+        return to_torch_device(self._L, self.cfg)
 
     @override
     def lift(self, surface_data: torch.Tensor):
@@ -258,7 +258,7 @@ class FernandezHickenZingg(BaseBasis):
 
     @cached_property
     def mass_op(self):
-        return torch.from_numpy(self._H).to(self.cfg.device)
+        return to_torch_device(self._H, self.cfg)
 
     @override
     def error(self, error_data: torch.Tensor, element_jac_det: torch.Tensor):
