@@ -96,7 +96,7 @@ class Moments:
         )
 
         # dimensional rho, ux, uy, T, qx, qy, Pxx, Pyy, Pxy
-        ele_sol[:, :, 0:9] *= torch.Tensor(
+        ele_sol[:, :, 0:9] *= torch.tensor(
             [
                 rho0,
                 u0,
@@ -108,7 +108,6 @@ class Moments:
                 0.5 * rho0 * (u0**2),
                 0.5 * rho0 * (u0**2),
             ],
-            dtype=soln.dtype,
             device=soln.device,
         ).reshape(1, 1, 9)
 
