@@ -8,6 +8,7 @@ from edgfs2D.fields.types import FieldData, FieldDataTuple
 from edgfs2D.solvers.fast_spectral.create_boundary_conditions import (
     get_boundary_condition,
 )
+from edgfs2D.solvers.fast_spectral.create_entropy_flux import get_eflux
 from edgfs2D.solvers.fast_spectral.create_flux import get_flux
 from edgfs2D.solvers.fast_spectral.create_initial_conditions import (
     get_initial_condition,
@@ -40,6 +41,13 @@ class FsField(DgField):
         self._flux = get_flux(self.cfg, self.kind, distmesh.vmesh)
         self._velocity = self._flux.velocity
 
+        # define entropy flux
+        self._eflux = get_eflux(self.cfg, self.kind, distmesh.vmesh)
+
+    @property
+    def is_eflux_enabled(self):
+        return self._eflux is not None
+
     def apply_initial_condition(self, u: FieldData):
         ic = get_initial_condition(self.cfg, self.kind, self._distmesh.vmesh)
         super()._apply_initial_condition(u, ic)
@@ -61,6 +69,9 @@ class FsField(DgField):
         super()._compute_flux(
             ul, ur, self._boundary_interface_normals, self._flux
         )
+
+    def compute_entropy_flux(self, ul: FieldData, ur: FieldData) -> FieldData:
+        return super()._compute_entropy_flux(ul, ur, self._eflux)
 
     def convect(self, gradu: FieldData) -> FieldData:
         return super()._convect(gradu, self._velocity)

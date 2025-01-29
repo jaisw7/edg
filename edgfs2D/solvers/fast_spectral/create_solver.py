@@ -50,12 +50,23 @@ class FastSpectralSolver(BaseSolver, MomentMixin):
         # load plugins
         self._time.load_plugins(self)
 
+    def eval_derivate(self, u: FieldData):
+        fs = self._fs
+
+        if fs.is_eflux_enabled:
+            eflux = fs.compute_entropy_flux(u, u)
+            conv = fs.convect_eflux(eflux)
+        else:
+            gradu = fs.grad(u)
+            conv = fs.convect(gradu)
+
+        return conv
+
     def rhs(self, curr_time: torch.float64, u: FieldData):
         fs = self._fs
 
         # compute convective derivative
-        gradu = fs.grad(u)
-        conv = fs.convect(gradu)
+        conv = self.eval_derivate(u)
         conv.mul_(-1)
 
         # traces at boundaries

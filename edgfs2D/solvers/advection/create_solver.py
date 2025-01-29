@@ -30,9 +30,6 @@ class AdvSolver(BaseSolver):
         self._intg = intg
         self._advf = AdvField(cfg, dgmesh)
 
-        # load plugins
-        self._time.load_plugins(self)
-
         # tensors for storage of solutions
         self._u0 = self._advf.create_new_field()
         self._u1 = self._advf.create_new_field()
@@ -42,6 +39,9 @@ class AdvSolver(BaseSolver):
             self._u1 = self._advf.read_field(time.args.soln, self.field_name)
         else:
             self._advf.apply_initial_condition(self._u1)
+
+        # load plugins
+        self._time.load_plugins(self)
 
     def eval_derivate(self, u: FieldData):
         advf = self._advf
