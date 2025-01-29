@@ -30,6 +30,7 @@ modules = [
     "edgfs2D.basis.tri",
     "edgfs2D.boundary_conditions",
     "edgfs2D.distribution_mesh",
+    "edgfs2D.entropy_fluxes",
     "edgfs2D.fields",
     "edgfs2D.fields.readers",
     "edgfs2D.fields.writers",
