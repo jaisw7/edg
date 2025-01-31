@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from argparse import ArgumentParser, FileType
 
+import numpy as np
 import pyvista as pv
 from loguru import logger
 from typing_extensions import override
@@ -29,7 +30,7 @@ class ComputeErrorPostProcessor(BasePostProcessor):
     @override
     def execute(self):
         file1 = pv.read(self._vf1)
-        file2 = pv.read(self._vf1)
+        file2 = pv.read(self._vf2)
 
         # Check if the number of points is the same
         if file1.number_of_points != file2.number_of_points:
