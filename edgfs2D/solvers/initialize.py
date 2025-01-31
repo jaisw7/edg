@@ -4,11 +4,16 @@ import os
 from argparse import ArgumentParser, FileType
 from pathlib import Path
 
+import torch
+
 from edgfs2D.utils.dictionary import Dictionary
 from edgfs2D.utils.util import split_vargs
 
 
 def initialize():
+    # do not track gradients globally
+    torch.set_grad_enabled(False)
+
     ap = ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", help="sub-command help")
 
