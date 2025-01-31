@@ -80,7 +80,7 @@ install_requires = [
 ]
 
 # Soft dependencies
-extras_require = {}
+extras_require = {"pyvista >= 0.44"}
 
 # Scripts
 console_scripts = [

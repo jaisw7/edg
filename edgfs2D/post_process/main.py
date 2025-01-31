@@ -3,30 +3,44 @@
 """
 Post process solution
 """
+from argparse import REMAINDER, ArgumentParser, FileType
+from pathlib import Path
 
-from edgfs2D.physical_mesh.dg_mesh import DgMesh
-from edgfs2D.physical_mesh.primitive_mesh import PrimitiveMesh
+import torch
+
 from edgfs2D.post_process import get_post_processor
-from edgfs2D.post_process.initialize import initialize
-from edgfs2D.time.physical_time import PhysicalTime
 
 
 def main():
-    # read the inputs
-    cfg, args = initialize()
+    # do not track gradients globally
+    torch.set_grad_enabled(False)
 
-    # define physical time
-    time = PhysicalTime(cfg, args)
+    ap = ArgumentParser()
 
-    # define primitive mesh
-    pmesh = PrimitiveMesh(cfg, time)
+    # Post process command
+    ap.add_argument(
+        "p",
+        type=str,
+        help="post processor name. Example: vtu",
+    )
 
-    # define discontinous galerkin mesh
-    dgmesh = DgMesh(cfg, pmesh)
+    # Add a special argument to capture everything after '--'
+    ap.add_argument(
+        "plugin_args",
+        nargs=REMAINDER,
+        help="Arguments to be forwarded to the plugin",
+    )
 
-    # define post processor
-    pp = get_post_processor(args.p, dgmesh)
-    pp.execute()
+    # Parse the arguments
+    args = ap.parse_args()
+
+    # Invoke the post process method
+    if hasattr(args, "p"):
+        pp = get_post_processor(args.p, args.plugin_args)
+        pp.execute()
+    else:
+        ap.print_help()
+        exit(0)
 
 
 def __main__():

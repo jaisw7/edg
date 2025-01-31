@@ -2,6 +2,7 @@
 import base64
 import sys
 import zlib
+from argparse import ArgumentParser, FileType
 from pathlib import Path
 
 import numpy as np
@@ -9,15 +10,46 @@ from typing_extensions import override
 
 from edgfs2D.fields.readers.h5 import H5FieldReader
 from edgfs2D.physical_mesh.dg_mesh import DgMesh
+from edgfs2D.physical_mesh.primitive_mesh import PrimitiveMesh
 from edgfs2D.post_process.base import BasePostProcessor
+from edgfs2D.time.physical_time import PhysicalTime
+from edgfs2D.utils.dictionary import Dictionary
+from edgfs2D.utils.util import split_vargs
 
 
 class VtuPostProcessor(BasePostProcessor):
     kind = "vtu"
     extn = ".vtu"
 
-    def __init__(self, dgmesh: DgMesh, *args, **kwargs):
-        super().__init__(dgmesh, *args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # parse args
+        pargs = self.parse_args()
+        cfg = Dictionary.load(pargs.inp, defaults=split_vargs(pargs.v))
+        self.dgmesh = DgMesh(cfg, PrimitiveMesh(cfg, PhysicalTime(cfg, pargs)))
+        self._subdivs = pargs.s
+
+    @override
+    def parse_args(self):
+        parser = ArgumentParser(description=f"Create a VTU file")
+        parser.add_argument("inp", type=FileType("r"), help="input file")
+        parser.add_argument("mesh", type=FileType("r"), help="input mesh file")
+        parser.add_argument("soln", type=Path, help="input solution file")
+        parser.add_argument(
+            "-v",
+            nargs=2,
+            action="append",
+            default=[],
+            help="substitute variables. Example: -v basis-tri::degree 2",
+        )
+        parser.add_argument(
+            "-s",
+            type=int,
+            default=1,
+            help="Subdivisions per element (default = 1)",
+        )
+        return parser.parse_args(self.args)
 
     @override
     def execute(self):
@@ -66,7 +98,7 @@ class VtuPostProcessor(BasePostProcessor):
 
         # define uniform nodes on the basis elements
         basis = basis[shape]
-        celldata = CellData(2 * basis.num_nodes)
+        celldata = CellData(self._subdivs * basis.num_nodes)
         nodes = celldata.nodes()
 
         # interpolate to new nodes
