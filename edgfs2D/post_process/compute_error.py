@@ -43,13 +43,11 @@ class ComputeErrorPostProcessor(BasePostProcessor):
         if file1.number_of_cells != file2.number_of_cells:
             print("The files have different numbers of cells.")
         else:
-            cells_match = True
-            for cell1, cell2 in zip(file1.cells, file2.cells):
-                if not np.array_equal(cell1, cell2):
-                    cells_match = False
-                    break
-            if not cells_match:
-                raise RuntimeError("The files have the same cell connectivity")
+            if not all(
+                np.array_equal(c1, c2)
+                for c1, c2 in zip(file1.cells, file2.cells)
+            ):
+                raise RuntimeError("The files have different cell connectivity")
 
         # Check if the cell types are the same
         if not np.array_equal(file1.celltypes, file2.celltypes):
