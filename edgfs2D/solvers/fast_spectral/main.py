@@ -8,10 +8,9 @@ import numpy as np
 import torch
 
 from edgfs2D.distribution_mesh.dgdist_mesh import DgDistMesh
-from edgfs2D.integrators import get_integrator
 from edgfs2D.physical_mesh.dg_mesh import DgMesh
 from edgfs2D.physical_mesh.nondim_mesh import NondimMesh
-from edgfs2D.solvers.fast_spectral.create_solver import FastSpectralSolver
+from edgfs2D.solvers.fast_spectral.create_solver import get_solver_formulation
 from edgfs2D.solvers.fast_spectral.nondim import NondimParams
 from edgfs2D.solvers.initialize import initialize
 from edgfs2D.time.physical_time import PhysicalTime
@@ -40,11 +39,8 @@ def main():
     # define distribution mesh
     distmesh = DgDistMesh(dgmesh, vmesh)
 
-    # define integrator
-    intg = get_integrator(cfg)
-
     # create solver
-    solver = FastSpectralSolver(cfg, time, distmesh, intg)
+    solver = get_solver_formulation(cfg, distmesh)
     solver.solve()
 
 

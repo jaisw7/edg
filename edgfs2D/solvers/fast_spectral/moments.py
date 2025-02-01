@@ -1,7 +1,6 @@
 from functools import lru_cache
 
 import torch
-from loguru import logger
 
 from edgfs2D.velocity_mesh.base import BaseVelocityMesh
 
@@ -24,9 +23,7 @@ class Moments:
 
     @lru_cache(maxsize=None)
     def vpoints(self, dtype, device):
-        return torch.from_numpy(self._vmesh.points).to(
-            dtype=dtype, device=device
-        )
+        return self._vmesh.points
 
     def __call__(self, soln: torch.Tensor):
         vm = self._vmesh

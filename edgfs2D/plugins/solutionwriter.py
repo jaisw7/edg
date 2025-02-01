@@ -12,7 +12,11 @@ from edgfs2D.utils.dictionary import SubDictionary
 
 class SolutionWriterPlugin(BasePlugin):
     kind = "solutionwriter"
-    allowed_solvers = ["AdvSolver", "FastSpectralSolver"]
+    allowed_solvers = [
+        "AdvSolver",
+        "ClassicFastSpectralSolver",
+        "ImexFastSpectralSolver",
+    ]
 
     """Write current solution fields for the solver"""
 

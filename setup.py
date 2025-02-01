@@ -48,6 +48,7 @@ modules = [
     "edgfs2D.solvers",
     "edgfs2D.solvers.advection",
     "edgfs2D.solvers.fast_spectral",
+    "edgfs2D.solvers.fast_spectral.formulations",
     "edgfs2D.sphericaldesign",
     "edgfs2D.sphericaldesign.symmetric",
     "edgfs2D.time",
@@ -80,7 +81,7 @@ install_requires = [
 ]
 
 # Soft dependencies
-extras_require = {"pyvista >= 0.44"}
+extras_require = {"pyvista >= 0.44", "autoflake >= 2.3"}
 
 # Scripts
 console_scripts = [

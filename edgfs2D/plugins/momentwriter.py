@@ -12,7 +12,7 @@ from edgfs2D.utils.dictionary import SubDictionary
 
 class MomentWriterPlugin(BasePlugin):
     kind = "momentwriter"
-    allowed_solvers = ["FastSpectralSolver"]
+    allowed_solvers = ["ClassicFastSpectralSolver", "ImexFastSpectralSolver"]
 
     """Write moments for the solver"""
 

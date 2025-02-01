@@ -10,7 +10,6 @@ from edgfs2D.solvers.fast_spectral.create_initial_conditions import (
     MaxwellianInitialCondition,
 )
 from edgfs2D.utils.dictionary import SubDictionary
-from edgfs2D.utils.util import to_torch_device
 from edgfs2D.velocity_mesh.base import BaseVelocityMesh
 
 
@@ -35,7 +34,7 @@ class FastSpectralBoundaryCondition(BaseBoundaryCondition):
 
     @cached_property
     def vpoints(self):
-        return to_torch_device(self._vmesh.points, self._cfg)
+        return self._vmesh.points
 
     @cached_property
     def vweights(self):

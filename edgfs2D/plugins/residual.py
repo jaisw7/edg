@@ -10,7 +10,11 @@ from edgfs2D.utils.dictionary import SubDictionary
 
 class ResidualPlugin(BasePlugin):
     kind = "residual"
-    allowed_solvers = ["AdvSolver", "FastSpectralSolver"]
+    allowed_solvers = [
+        "AdvSolver",
+        "ClassicFastSpectralSolver",
+        "ImexFastSpectralSolver",
+    ]
 
     """Write norm"""
 

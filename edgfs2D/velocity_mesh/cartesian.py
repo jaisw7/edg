@@ -1,7 +1,10 @@
+from functools import cached_property
+
 import numpy as np
 from loguru import logger
 from typing_extensions import override
 
+from edgfs2D.utils.util import to_torch_device
 from edgfs2D.velocity_mesh.base import BaseVelocityMesh
 
 
@@ -67,9 +70,9 @@ class Cartesian(BaseVelocityMesh):
         return (self._Nv, self._Nv, self._Nv)
 
     @override
-    @property
+    @cached_property
     def points(self):
-        return self._cv
+        return to_torch_device(self._cv, self._cfg)
 
     @override
     @property

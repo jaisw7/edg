@@ -9,7 +9,11 @@ from edgfs2D.utils.dictionary import SubDictionary
 
 class NanCheckPlugin(BasePlugin):
     kind = "nancheck"
-    allowed_solvers = ["AdvSolver", "FastSpectralSolver"]
+    allowed_solvers = [
+        "AdvSolver",
+        "ClassicFastSpectralSolver",
+        "ImexFastSpectralSolver",
+    ]
 
     """Check for solution blowup"""
 

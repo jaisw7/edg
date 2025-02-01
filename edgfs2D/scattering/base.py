@@ -3,12 +3,12 @@ from abc import ABCMeta, abstractmethod
 import torch
 
 from edgfs2D.utils.dictionary import SubDictionary
-from edgfs2D.utils.util import to_torch_device
 from edgfs2D.velocity_mesh.base import BaseVelocityMesh
 
 
 class BaseScatteringModel(object, metaclass=ABCMeta):
     kind = None
+    allowed_solvers = None
 
     def __init__(
         self, cfg: SubDictionary, vmesh: BaseVelocityMesh, *args, **kwargs

@@ -27,11 +27,9 @@ class DgField(object, metaclass=ABCMeta):
         self.dgmesh = dgmesh
         self.nvars = nvars
 
-    def _alloc_torch(self, size):
+    def _alloc_torch(self, size, nvars):
         return torch.empty(
-            [*size, self.nvars],
-            dtype=self.cfg.ttype,
-            device=self.cfg.device,
+            [*size, nvars], dtype=self.cfg.ttype, device=self.cfg.device
         )
 
     def _to_device(self, data: FieldData):
@@ -110,10 +108,11 @@ class DgField(object, metaclass=ABCMeta):
             self.dgmesh.get_boundary_interface_scaled_jacobian_det
         )
 
-    def create_new_field(self) -> FieldData:
+    def create_new_field(self, nvars=None) -> FieldData:
+        nvars = nvars if nvars else self.nvars
         element_data = FieldData()
         for shape, size in self.dgmesh.get_element_data_sizes.items():
-            element_data[shape] = self._alloc_torch(size)
+            element_data[shape] = self._alloc_torch(size, nvars)
         return element_data
 
     def grad(self, u: FieldData) -> FieldData:

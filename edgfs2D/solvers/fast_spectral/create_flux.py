@@ -4,7 +4,6 @@ from typing_extensions import override
 from edgfs2D.fluxes import get_flux_by_cls_and_name
 from edgfs2D.fluxes.base import BaseFlux
 from edgfs2D.utils.dictionary import SubDictionary
-from edgfs2D.utils.util import torch_map
 from edgfs2D.velocity_mesh.base import BaseVelocityMesh
 
 
@@ -19,9 +18,7 @@ class LaxFriedrichsFlux(FastSpectralFlux):
         self, cfg: SubDictionary, vm: BaseVelocityMesh, *args, **kwargs
     ):
         super().__init__(cfg, *args, **kwargs)
-        self._velocity = torch.from_numpy(vm.points).to(
-            dtype=cfg.ttype, device=cfg.device
-        )
+        self._velocity = vm.points
 
     @override
     @property

@@ -58,22 +58,24 @@ class FieldData(Dict[Shape, torch.Tensor]):
     def unary_apply_(self, funcName: str, *args, **kwargs):
         for shape, value in self.items():
             getattr(value, funcName)(*args, **kwargs)
+        return self
 
     def binary_apply_(self, funcName: str, other: FieldData, *args, **kwargs):
         for shape, value in self.items():
             getattr(value, funcName)(other[shape], *args, **kwargs)
+        return self
 
     def mul_(self, *args, **kwargs):
-        self.unary_apply_("mul_", *args, **kwargs)
+        return self.unary_apply_("mul_", *args, **kwargs)
 
     def sin_(self, *args, **kwargs):
-        self.unary_apply_("sin_", *args, **kwargs)
+        return self.unary_apply_("sin_", *args, **kwargs)
 
     def add_(self, other: FieldData, *args, **kwargs):
-        self.binary_apply_("add_", other, *args, **kwargs)
+        return self.binary_apply_("add_", other, *args, **kwargs)
 
     def sub_(self, other: FieldData, *args, **kwargs):
-        self.binary_apply_("sub_", other, *args, **kwargs)
+        return self.binary_apply_("sub_", other, *args, **kwargs)
 
 
 FieldDataList: TypeAlias = List[FieldData]

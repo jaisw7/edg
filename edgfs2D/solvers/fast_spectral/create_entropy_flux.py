@@ -5,7 +5,6 @@ from edgfs2D.entropy_fluxes import get_eflux_by_cls_and_name
 from edgfs2D.entropy_fluxes.base import BaseEntropyFlux
 from edgfs2D.utils.dictionary import SubDictionary
 from edgfs2D.utils.nputil import ndrange
-from edgfs2D.utils.util import torch_map
 from edgfs2D.velocity_mesh.base import BaseVelocityMesh
 
 
@@ -20,9 +19,7 @@ class BoltzmannEntropyFlux(FastSpectralEntropyFlux):
         self, cfg: SubDictionary, vm: BaseVelocityMesh, *args, **kwargs
     ):
         super().__init__(cfg, *args, **kwargs)
-        self._velocity = torch.from_numpy(vm.points).to(
-            dtype=cfg.ttype, device=cfg.device
-        )
+        self._velocity = vm.points
 
     @override
     @property
@@ -32,7 +29,6 @@ class BoltzmannEntropyFlux(FastSpectralEntropyFlux):
     def log_mean(self, x: torch.Tensor, y: torch.Tensor):
         # Ismail and Roe, J. Comput. Phys. 228 (15) (2009) 5410–5436
         eps = torch.finfo(x.dtype).eps
-        shape = x.shape
         u = (x * (x - 2 * y) + y * y) / (x * (x + 2 * y) + y * y)
         return torch.where(
             u < 1e-4,

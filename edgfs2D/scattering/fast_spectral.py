@@ -16,6 +16,7 @@ from edgfs2D.velocity_mesh.base import BaseVelocityMesh
 # Simplified VHS model for GLL based nodal collocation schemes
 class FastSpectral(BaseScatteringModel):
     kind = "fast-spectral-vhs"
+    allowed_solvers = ["ClassicFastSpectralSolver"]
 
     def __init__(
         self, cfg: SubDictionary, vmesh: BaseVelocityMesh, *args, **kwargs
@@ -76,15 +77,10 @@ class FastSpectral(BaseScatteringModel):
     def perform_precomputation(self):
         # Precompute aa, bb1, bb2 (required for kernel)
         vm = self.vmesh
-        ndim = vm.nondim
-
         N = vm.shape[0]
-        Nrho = self._Nrho
-        M = self._M
         L = vm.extents
         qz = self._qz
         qw = self._qw
-        sz = self._sz
         sw = self._sw
         vsize = vm.num_points
         gamma = self._gamma
@@ -126,7 +122,7 @@ class FastSpectral(BaseScatteringModel):
         for k, e in ndrange(*element_data.shape[:2]):
             out[k, e, :].add_(self.solve_at_point(element_data[k, e, :]))
 
-    def solve_at_point(self, f0: torch.Tensor):
+    def solve_at_point(self, f0: torch.Tensor, nu=None):
         # convert real valued tensor to complex valued tensor
         shape = self.vmesh.shape
         mnshape = (self._M, self._Nrho, *shape)
@@ -162,7 +158,28 @@ class FastSpectral(BaseScatteringModel):
         # inverse fft| fC = iff(FTf)
         fC = ifft3(Ftf)
 
+        if nu is not None:
+            nu.copy_(fC.real.sum().mul_(self._prefactor))
+
         # output
         return (
             (QG - fC.mul_(f0.reshape(shape))).real.mul_(self._prefactor).ravel()
         )
+
+
+# Simplified VHS model for GLL based nodal collocation schemes
+class PenalizedFastSpectral(FastSpectral):
+    kind = "penalized-fast-spectral-vhs"
+    allowed_solvers = ["ImexFastSpectralSolver"]
+
+    def solve(
+        self,
+        curr_time: torch.float64,
+        element_data: torch.Tensor,
+        out: torch.Tensor,
+        nu: torch.Tensor,
+    ):
+        for k, e in ndrange(*element_data.shape[:2]):
+            out[k, e, :].add_(
+                self.solve_at_point(element_data[k, e, :], nu=nu[k, e, :])
+            )

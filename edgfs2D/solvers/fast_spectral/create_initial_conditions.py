@@ -53,12 +53,12 @@ class MaxwellianInitialCondition(FastSpectralInitialCondition):
 
         # define maxwellian
         self._init_vals = (self._rhoini / (np.pi * self._Tini) ** 1.5) * np.exp(
-            -np.sum((vm.points - self._uini) ** 2, axis=0) / self._Tini
+            -np.sum((vm._cv - self._uini) ** 2, axis=0) / self._Tini
         )
 
         # test the distribution support
-        cv = self.vmesh.points
-        vsize = self.vmesh.num_points
+        cv = self.vmesh._cv
+        self.vmesh.num_points
         cw = self.vmesh.weights
         T0 = self.vmesh.nondim.T0
         rho0 = self.vmesh.nondim.rho0
