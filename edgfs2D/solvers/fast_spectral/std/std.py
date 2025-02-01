@@ -31,7 +31,7 @@ def main():
     dgmesh = DgMesh(cfg, nmesh)
 
     # define DG field to hold value of distribution function
-    u = DgScalarField(cfg, dgmesh)
+    # u = DgScalarField(cfg, dgmesh)
 
     # define velocity mesh
     # vm = get_velocity_mesh(cfg, nondim)

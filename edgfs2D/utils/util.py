@@ -11,13 +11,6 @@ torch_rmap = {t.float32: "float", t.float64: "double"}
 torch_cmap = {"float": t.complex64, "double": t.complex128}
 
 
-def get_kernel(module, funcname, args):
-    func = module.get_function(funcname)
-    func.prepare(args)
-    func.set_cache_config(cuda.func_cache.PREFER_L1)
-    return func
-
-
 def to_torch(data: Union[t.Tensor, np.ndarray]):
     return data if isinstance(data, t.Tensor) else t.from_numpy(data)
 

@@ -14,5 +14,5 @@ def get_quadrature_by_name(cfg, name, *args, **kwargs):
 
 def get_quadrature_by_shape(cfg, shape, *args, **kwargs):
     return get_quadrature_by_name(
-        cfg, "{}-{}".format(quadrature_sect, name), *args, **kwargs
+        cfg, "{}-{}".format(quadrature_sect, shape), *args, **kwargs
     )

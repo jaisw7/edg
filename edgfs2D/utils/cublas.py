@@ -327,7 +327,7 @@ class CUDACUBLASKernels(object):
 
         #w.cublasSetStream(self._handle, queue.cuda_stream_comp.handle)
         cublastrsm(self._handle, cs, fm, opA, du, m, n,
-                    alpha_ct, a.ptr, sA[1], x.ptr)
+                    alpha_ct, a.ptr, sA[1], y.ptr)
 
 
     def transpose(self, a, sA, b):

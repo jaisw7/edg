@@ -1,7 +1,7 @@
-import numpy as np
 import torch
-from typing_extensions import override
+from typing_extensions import Dict
 
+from edgfs2D.boundary_conditions.base import BaseBoundaryCondition
 from edgfs2D.distribution_mesh.dgdist_mesh import DgDistMesh
 from edgfs2D.fields.dgfield import DgField
 from edgfs2D.fields.types import FieldData, FieldDataTuple
