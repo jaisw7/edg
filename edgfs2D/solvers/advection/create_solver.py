@@ -1,11 +1,8 @@
 from pathlib import Path
-from timeit import default_timer as timer
 
-import numpy as np
 import torch
 from typing_extensions import override
 
-from edgfs2D.fields.dgfield import DgField
 from edgfs2D.fields.types import FieldData, FieldDataList
 from edgfs2D.integrators.base import BaseIntegrator
 from edgfs2D.physical_mesh.dg_mesh import DgMesh
@@ -79,8 +76,6 @@ class AdvSolver(BaseSolver):
     def solve(self):
         intg = self._intg
         time = self._time
-
-        u_ex = self._u1.clone()
 
         while time.run():
             self._u0.copy_(self._u1)

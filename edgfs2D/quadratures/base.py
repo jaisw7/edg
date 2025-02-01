@@ -1,7 +1,5 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 
-import numpy as np
-
 
 class BaseQuadrature(object, metaclass=ABCMeta):
     kind = None

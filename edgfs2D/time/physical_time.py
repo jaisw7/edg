@@ -1,4 +1,3 @@
-import re
 from argparse import Namespace
 from pathlib import Path
 

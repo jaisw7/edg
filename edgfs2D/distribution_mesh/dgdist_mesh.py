@@ -1,4 +1,3 @@
-from argparse import Namespace
 
 from edgfs2D.physical_mesh.dg_mesh import DgMesh
 from edgfs2D.velocity_mesh.base import BaseVelocityMesh

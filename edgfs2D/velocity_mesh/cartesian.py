@@ -46,13 +46,13 @@ class Cartesian(BaseVelocityMesh):
             self._Nv,
         )
         self._cv = np.zeros((3, self._vsize), dtype=self._cfg.dtype)
-        for l in range(self._vsize):
-            I = int(l / (self._Nv * self._Nv))
-            J = int((l % (self._Nv * self._Nv)) / self._Nv)
-            K = int((l % (self._Nv * self._Nv)) % self._Nv)
-            self._cv[0, l] = c0[I]
-            self._cv[1, l] = c0[J]
-            self._cv[2, l] = c0[K]
+        for id in range(self._vsize):
+            I = int(id / (self._Nv * self._Nv))
+            J = int((id % (self._Nv * self._Nv)) / self._Nv)
+            K = int((id % (self._Nv * self._Nv)) % self._Nv)
+            self._cv[0, id] = c0[I]
+            self._cv[1, id] = c0[J]
+            self._cv[2, id] = c0[K]
 
     @override
     @property

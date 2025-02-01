@@ -4,7 +4,6 @@ from typing_extensions import override
 from edgfs2D.entropy_fluxes import get_eflux_by_cls_and_name
 from edgfs2D.entropy_fluxes.base import BaseEntropyFlux
 from edgfs2D.utils.dictionary import SubDictionary
-from edgfs2D.utils.util import torch_map
 
 
 class AdvEntropyFlux(BaseEntropyFlux):

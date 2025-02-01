@@ -19,7 +19,7 @@ class H5FieldWriter(BaseFieldWriter):
         )
 
         # clear contents
-        with h5py.File(self._path, "w") as h5f:
+        with h5py.File(self._path, "w") as h5f:  # noqa
             pass
 
     @override

@@ -1,4 +1,3 @@
-from argparse import Namespace
 
 from edgfs2D.physical_mesh.primitive_mesh import PrimitiveMesh
 from edgfs2D.solvers.fast_spectral.nondim import NondimParams

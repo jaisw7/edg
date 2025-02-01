@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from edgfs2D.utils.nputil import subclass_where
 from edgfs2D.velocity_mesh.base import BaseVelocityMesh
-from edgfs2D.velocity_mesh.cartesian import Cartesian
+from edgfs2D.velocity_mesh.cartesian import Cartesian  # noqa
 
 velocity_mesh_sect = "velocity-mesh"
 

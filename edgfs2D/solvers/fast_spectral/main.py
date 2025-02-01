@@ -4,8 +4,6 @@
 Entropy Stable discontinous galerkin solver for Boltzmann equation
 """
 
-import numpy as np
-import torch
 
 from edgfs2D.distribution_mesh.dgdist_mesh import DgDistMesh
 from edgfs2D.physical_mesh.dg_mesh import DgMesh

@@ -87,15 +87,15 @@ class FastSpectral(BaseScatteringModel):
 
         # compute l: permutation for reindexing FFT modes
         l0 = np.concatenate((np.arange(0, N / 2), np.arange(-N / 2, 0)))
-        l = np.zeros((3, vsize))
+        perm = np.zeros((3, vsize))
         for idv in range(vsize):
             I = int(idv / (N * N))
             J = int((idv % (N * N)) / N)
             K = int((idv % (N * N)) % N)
-            l[0, idv] = l0[I]
-            l[1, idv] = l0[J]
-            l[2, idv] = l0[K]
-        self._l = to_torch_device(l, self._cfg)
+            perm[0, idv] = l0[I]
+            perm[1, idv] = l0[J]
+            perm[2, idv] = l0[K]
+        self._l = to_torch_device(perm, self._cfg)
 
         # precompute aa
         fac = torch.pi / L / 2

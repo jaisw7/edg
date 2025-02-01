@@ -1,0 +1,7 @@
+[flake8]
+include = edgfs2D
+exclude =
+    proto,
+    back,
+    __pycache__,
+    *.pyc

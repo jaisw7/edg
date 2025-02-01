@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import torch
 from loguru import logger
 
 from edgfs2D.fields.types import FieldData

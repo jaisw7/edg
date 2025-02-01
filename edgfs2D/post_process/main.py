@@ -3,8 +3,7 @@
 """
 Post process solution
 """
-from argparse import REMAINDER, ArgumentParser, FileType
-from pathlib import Path
+from argparse import REMAINDER, ArgumentParser
 
 import torch
 

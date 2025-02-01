@@ -4,8 +4,6 @@
 Entropy Stable discontinous galerkin solver for advection equation
 """
 
-import numpy as np
-import torch
 
 from edgfs2D.integrators import get_integrator
 from edgfs2D.physical_mesh.dg_mesh import DgMesh

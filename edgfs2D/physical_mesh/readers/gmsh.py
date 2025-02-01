@@ -14,11 +14,11 @@ def msh_section(mshit, section):
     endln = "$End{}\n".format(section)
     endix = int(next(mshit)) - 1
 
-    for i, l in enumerate(mshit):
-        if l == endln:
+    for i, line in enumerate(mshit):
+        if line == endln:
             raise ValueError("Unexpected end of section $" + section)
 
-        yield l.strip()
+        yield line.strip()
 
         if i == endix:
             break
@@ -76,13 +76,13 @@ class GmshReader(BaseReader):
             "Entities": self._read_entities,
         }
 
-        for l in filter(lambda l: l != "\n", mshit):
+        for line in filter(lambda l: l != "\n", mshit):
             # Ensure we have encountered a section
-            if not l.startswith("$"):
+            if not line.startswith("$"):
                 raise ValueError("Expected a mesh section")
 
             # Strip the '$' and '\n' to get the section name
-            sect = l[1:-1]
+            sect = line[1:-1]
 
             # If the section is known then read it
             if sect in sect_map:
@@ -126,8 +126,8 @@ class GmshReader(BaseReader):
         seen = set()
 
         # Extract the physical names
-        for l in msh_section(msh, "PhysicalNames"):
-            m = re.match(r'(\d+) (\d+) "((?:[^"\\]|\\.)*)"$', l)
+        for line in msh_section(msh, "PhysicalNames"):
+            m = re.match(r'(\d+) (\d+) "((?:[^"\\]|\\.)*)"$', line)
             if not m:
                 raise ValueError("Malformed physical entity")
 

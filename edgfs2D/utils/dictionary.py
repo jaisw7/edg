@@ -2,7 +2,7 @@ import io
 import json
 import os
 import re
-from configparser import NoOptionError, NoSectionError, SafeConfigParser
+from configparser import SafeConfigParser
 
 import numpy as np
 

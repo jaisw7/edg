@@ -31,13 +31,13 @@ class BasePlugin(object, metaclass=ABCMeta):
 
     def get_basename(self):
         if not (self._cfg.has_option("basename")):
-            raise ValueError(f"basename must be provided for plugin", self.kind)
+            raise ValueError("basename must be provided for plugin", self.kind)
 
         basedir = Path(self._cfg.lookuppath("basedir", ".", abs=True))
 
         if not basedir.is_dir():
             raise ValueError(
-                f"basedir {basedir} provided for plugin {self.kind} does not exist"
+                f"basedir {basedir} provided for plugin {self.kind} does not exist"  # noqa
             )
 
         basename = self._cfg.lookup("basename")

@@ -2,20 +2,19 @@ from abc import ABCMeta
 from functools import cached_property
 from pathlib import Path
 
-import numpy as np
 import torch
 from typing_extensions import Dict
 
 from edgfs2D.boundary_conditions.base import BaseBoundaryCondition
 from edgfs2D.entropy_fluxes.base import BaseEntropyFlux
 from edgfs2D.fields.readers.h5 import H5FieldReader
-from edgfs2D.fields.types import FieldData, FieldDataTuple, Shape
+from edgfs2D.fields.types import FieldData, FieldDataTuple
 from edgfs2D.fields.writers.h5 import H5FieldWriter
 from edgfs2D.fluxes.base import BaseFlux
 from edgfs2D.initial_conditions.base import BaseInitialCondition
 from edgfs2D.physical_mesh.dg_mesh import DgMesh
 from edgfs2D.utils.dictionary import Dictionary
-from edgfs2D.utils.util import to_torch, torch_map
+from edgfs2D.utils.util import to_torch
 
 
 class DgField(object, metaclass=ABCMeta):
@@ -219,7 +218,7 @@ class DgField(object, metaclass=ABCMeta):
         sdetl, _ = self._internal_interface_scaled_jacobian_det
 
         bnd = self._boundary_interfaces
-        xb = self._boundary_interface_nodes
+        self._boundary_interface_nodes
         nb = self._boundary_interface_normals
         sdetb = self._boundary_interface_scaled_jacobian_det
 

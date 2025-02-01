@@ -1,5 +1,4 @@
 import re
-from argparse import Namespace
 
 from edgfs2D.time.physical_time import PhysicalTime
 from edgfs2D.utils.dictionary import Dictionary

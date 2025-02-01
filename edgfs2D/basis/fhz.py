@@ -8,7 +8,7 @@ from edgfs2D.basis.base import BaseBasis, get_basis_for_shape
 from edgfs2D.proto.sbp_pb2 import SBP
 from edgfs2D.quadratures.jacobi import ortho_basis_at, tri_northo_basis
 from edgfs2D.utils.dictionary import Dictionary
-from edgfs2D.utils.util import to_torch_device, torch_map
+from edgfs2D.utils.util import to_torch_device
 
 
 # The nodal DG due to D. Del Rey Fernández, J. Hicken, and D. Zingg.

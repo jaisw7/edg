@@ -98,6 +98,10 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 
+description = (
+    "Entropy Stable Discontinuous Galerkin Fast Spectral in Two Dimensions"
+)
+
 long_description = """edgfs2D is an open-source minimalistic implementation of
 Entropy-Stable Discontinuous Galerkin Fast Spectral methods in two dimension"""
 
@@ -118,7 +122,7 @@ compile_proto()
 setup(
     name="edgfs2D",
     version=version,
-    description="Entropy Stable Discontinuous Galerkin Fast Spectral in Two Dimension",
+    description=description,
     long_description=long_description,
     author="Shashank Jaiswal",
     author_email="jaisw7@gmail.com",

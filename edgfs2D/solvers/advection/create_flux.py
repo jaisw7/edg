@@ -4,7 +4,6 @@ from typing_extensions import override
 from edgfs2D.fluxes import get_flux_by_cls_and_name
 from edgfs2D.fluxes.base import BaseFlux
 from edgfs2D.utils.dictionary import SubDictionary
-from edgfs2D.utils.util import torch_map
 
 
 class AdvFlux(BaseFlux):

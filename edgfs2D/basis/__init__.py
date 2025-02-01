@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from edgfs2D.basis.base import BaseBasis
-from edgfs2D.basis.fhz import FernandezHickenZingg
+from edgfs2D.basis.fhz import FernandezHickenZingg  # noqa
 from edgfs2D.utils.nputil import subclass_where
 
 basis_sect = "basis"

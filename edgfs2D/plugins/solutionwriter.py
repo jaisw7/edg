@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from pathlib import Path
 
-import torch
 from loguru import logger
 
 from edgfs2D.plugins.base import BasePlugin
@@ -27,7 +25,6 @@ class SolutionWriterPlugin(BasePlugin):
 
     def __call__(self):
         time = self._solver.time
-        solver = self._solver
 
         if time.should_output(self._nsteps):
             filename = self._basedir.joinpath(

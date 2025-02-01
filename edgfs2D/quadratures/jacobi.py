@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from math import cos, gamma, pi
+from math import gamma
 
 import numpy as np
 

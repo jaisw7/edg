@@ -32,7 +32,7 @@ class VtuPostProcessor(BasePostProcessor):
 
     @override
     def parse_args(self):
-        parser = ArgumentParser(description=f"Create a VTU file")
+        parser = ArgumentParser(description="Create a VTU file")
         parser.add_argument("inp", type=FileType("r"), help="input file")
         parser.add_argument("mesh", type=FileType("r"), help="input mesh file")
         parser.add_argument("soln", type=Path, help="input solution file")
@@ -71,19 +71,19 @@ class VtuPostProcessor(BasePostProcessor):
             "little": "LittleEndian",
             "big": "BigEndian",
         }
-        writeln(rf'<?xml version="1.0"?>')
-        writeln(rf'<VTKFile type="UnstructuredGrid"')
-        writeln(rf'         version="0.1"')
-        writeln(rf'         compressor="vtkZLibDataCompressor"')
+        writeln(r'<?xml version="1.0"?>')
+        writeln(r'<VTKFile type="UnstructuredGrid"')
+        writeln(r'         version="0.1"')
+        writeln(r'         compressor="vtkZLibDataCompressor"')
         writeln(rf'         byte_order="{byte_order[sys.byteorder]}">')
 
     def write_footer(self, writeln):
-        writeln(rf"</VTKFile>")
+        writeln(r"</VTKFile>")
 
     def write_unstructured_grid(self, writeln):
-        writeln(rf"<UnstructuredGrid>")
+        writeln(r"<UnstructuredGrid>")
         self.write_piece(writeln)
-        writeln(rf"</UnstructuredGrid>")
+        writeln(r"</UnstructuredGrid>")
 
     def write_piece(self, writeln):
         mesh = self.dgmesh
@@ -142,7 +142,7 @@ class VtuPostProcessor(BasePostProcessor):
         writeln(r"</PointData>")
 
         # write piece footer
-        writeln(rf"</Piece>")
+        writeln(r"</Piece>")
 
     def text_writer_compressed(self, writeln, data):
         max_block_size = 32768
@@ -176,11 +176,11 @@ class VtuPostProcessor(BasePostProcessor):
             np.dtype("uint32"): "UInt32",
         }
         writeln(rf'<DataArray type="{data_type.get(data.dtype)}"')
-        writeln(rf'           format="binary"')
+        writeln(r'           format="binary"')
         writeln(rf'           Name="{name}"')
         writeln(rf'           NumberOfComponents="{num_cmpts}">')
         self.text_writer_compressed(writeln, data.ravel())
-        writeln(rf"</DataArray>")
+        writeln(r"</DataArray>")
 
 
 class CellData(object):
@@ -203,11 +203,11 @@ class CellData(object):
 
         for row in range(n, 0, -1):
             # Lower and upper indices
-            l = (n - row) * (n + row + 3) // 2
-            u = l + row + 1
+            lo = (n - row) * (n + row + 3) // 2
+            u = lo + row + 1
 
             # Base offsets
-            off = [l, l + 1, u, u + 1, l + 1, u]
+            off = [lo, lo + 1, u, u + 1, lo + 1, u]
 
             # Generate current row
             subin = np.ravel(np.arange(row - 1)[..., None] + off)
