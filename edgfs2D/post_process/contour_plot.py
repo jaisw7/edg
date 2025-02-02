@@ -107,7 +107,7 @@ class ContourPlot:
         ticks,
         tick_width=0.2,
         format="%.2g",
-        inset_params=[0.65, 1.05, 0.4, 0.05],
+        inset_params=[0.65, 1.05, 0.35, 0.05],
     ):
         cbar = self.fig.colorbar(
             contour,
