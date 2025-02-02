@@ -16,6 +16,7 @@ from edgfs2D.utils.dictionary import Dictionary
 
 class BaseFormulation(BaseSolver, MomentMixin):
     formulation = None
+    field_name = "u"
 
     def __init__(self, cfg: Dictionary, distmesh: DgDistMesh):
         self._cfg = cfg

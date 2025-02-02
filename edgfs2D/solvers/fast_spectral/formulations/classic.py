@@ -7,7 +7,6 @@ from edgfs2D.utils.dictionary import Dictionary
 
 
 class ClassicFastSpectralSolver(BaseFormulation):
-    field_name = "u"
     formulation = "classic"
 
     def __init__(self, cfg: Dictionary, distmesh: DgDistMesh):
