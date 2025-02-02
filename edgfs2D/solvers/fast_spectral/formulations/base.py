@@ -34,7 +34,7 @@ class BaseFormulation(BaseSolver, MomentMixin):
             self._fs.apply_initial_condition(self._u1)
 
         # scattering model
-        self._sm = get_scattering_model(cfg, distmesh.vmesh)
+        self._sm = get_scattering_model(cfg, distmesh)
         if type(self).__name__ not in self._sm.allowed_solvers:
             raise RuntimeError(
                 f"Scattering model not supported by {type(self).__name__}"

@@ -7,6 +7,7 @@ from typing_extensions import override
 from edgfs2D.initial_conditions import get_ic_by_cls_and_name
 from edgfs2D.initial_conditions.base import BaseInitialCondition
 from edgfs2D.utils.dictionary import SubDictionary
+from edgfs2D.utils.nputil import npeval
 from edgfs2D.utils.util import to_torch_device
 from edgfs2D.velocity_mesh.base import BaseVelocityMesh
 
@@ -30,14 +31,14 @@ class MaxwellianInitialCondition(FastSpectralInitialCondition):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        ndim = self.vmesh.nondim
 
         self._rhoini = 1.0
         if not ("read_rho" in kwargs):
-            self._rhoini = self._cfg.lookupfloat("rho") / self.vmesh.nondim.rho0
+            self._rhoini = self._cfg.lookupfloat("rho") / ndim.rho0
 
-        self._Tini = self._cfg.lookupfloat("T") / self.vmesh.nondim.T0
-        self._uini = self._cfg.lookupfloat_list("u") / self.vmesh.nondim.u0
-        self._uini = self._uini.reshape((3, 1))
+        self._Tini = self._cfg.lookupfloat("T") / ndim.T0
+        self._uini = self._cfg.lookupfloat_list("u").reshape((3, 1)) / ndim.u0
         self._perform_precomputation()
 
     @cached_property
@@ -58,27 +59,23 @@ class MaxwellianInitialCondition(FastSpectralInitialCondition):
 
         # test the distribution support
         cv = self.vmesh._cv
-        self.vmesh.num_points
         cw = self.vmesh.weights
         T0 = self.vmesh.nondim.T0
         rho0 = self.vmesh.nondim.rho0
-        molarMass0 = self.vmesh.nondim.molarMass0
         u0 = self.vmesh.nondim.u0
-        mr = molarMass0 / molarMass0
-        mcw = mr * cw
 
         ele_sol = np.zeros(5)
         soln = self._init_vals
 
         # non-dimensional mass density
-        ele_sol[0] = np.sum(soln) * mcw
+        ele_sol[0] = np.sum(soln) * cw
 
         # non-dimensional velocities
-        ele_sol[1] = np.tensordot(soln, cv[0, :], axes=(0, 0)) * mcw
+        ele_sol[1] = np.tensordot(soln, cv[0, :], axes=(0, 0)) * cw
         ele_sol[1] /= ele_sol[0]
-        ele_sol[2] = np.tensordot(soln, cv[1, :], axes=(0, 0)) * mcw
+        ele_sol[2] = np.tensordot(soln, cv[1, :], axes=(0, 0)) * cw
         ele_sol[2] /= ele_sol[0]
-        ele_sol[3] = np.tensordot(soln, cv[2, :], axes=(0, 0)) * mcw
+        ele_sol[3] = np.tensordot(soln, cv[2, :], axes=(0, 0)) * cw
         ele_sol[3] /= ele_sol[0]
 
         # peculiar velocity
@@ -88,7 +85,7 @@ class MaxwellianInitialCondition(FastSpectralInitialCondition):
         cSqr = cx * cx + cy * cy + cz * cz
 
         # non-dimensional temperature
-        ele_sol[4] = np.sum(soln * cSqr, axis=0) * (2.0 / 3.0 * mcw * mr)
+        ele_sol[4] = np.sum(soln * cSqr, axis=0) * (2.0 / 3.0 * cw)
         ele_sol[4] /= ele_sol[0]
 
         if not (
@@ -112,6 +109,33 @@ class MaxwellianInitialCondition(FastSpectralInitialCondition):
         return np.broadcast_to(
             self._init_vals, (*x.shape[:2], len(self._init_vals.squeeze()))
         ).copy()
+
+
+class MaxwellianExprInitialCondition(FastSpectralInitialCondition):
+    kind = "fast-spectral-maxwellian-expr"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        ndim = self.vmesh.nondim
+        self._rhoexpr = self._cfg.lookupexpr("rho-expr")
+        self._Tini = self._cfg.lookupfloat("T") / ndim.T0
+        self._uini = self._cfg.lookupfloat_list("u").reshape((3, 1)) / ndim.u0
+        self._init_vals = (1 / (np.pi * self._Tini) ** 1.5) * np.exp(
+            -np.sum((self.vmesh._cv - self._uini) ** 2, axis=0) / self._Tini
+        )
+
+    @override
+    def apply(self, x: np.array):
+        vars = {"x": x[..., 0], "y": x[..., 1]}
+        rho = npeval(self._rhoexpr, vars) / self.vmesh.nondim.rho0
+        rho = rho.reshape((*x.shape[:2], -1))
+
+        return (
+            rho
+            * np.broadcast_to(
+                self._init_vals, (*x.shape[:2], len(self._init_vals.squeeze()))
+            ).copy()
+        )
 
 
 def get_initial_condition(cfg, name, *args, **kwargs):

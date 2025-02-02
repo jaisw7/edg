@@ -10,11 +10,11 @@ import sys
 from setuptools import setup
 
 # Python version
-if sys.version_info[:2] < (3, 3):
-    logging.error("edgfs2D requires Python 3.3 or newer")
+if sys.version_info[:2] < (3, 10):
+    logging.error("edgfs2D requires Python 3.10 or newer")
     sys.exit(-1)
 
-# DGFS version
+# EDGFS version
 vfile = open("_version.py").read()
 vsrch = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", vfile, re.M)
 

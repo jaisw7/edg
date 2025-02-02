@@ -8,9 +8,8 @@ from edgfs2D.quadratures.jacobi import zwgj
 from edgfs2D.scattering.base import BaseScatteringModel
 from edgfs2D.sphericaldesign import get_sphquadrule
 from edgfs2D.utils.dictionary import SubDictionary
-from edgfs2D.utils.nputil import ndrange
+from edgfs2D.utils.nputil import ndrange, npeval
 from edgfs2D.utils.util import to_torch_device
-from edgfs2D.velocity_mesh.base import BaseVelocityMesh
 
 
 # Simplified VHS model for GLL based nodal collocation schemes
@@ -18,11 +17,10 @@ class FastSpectral(BaseScatteringModel):
     kind = "fast-spectral-vhs"
     allowed_solvers = ["ClassicFastSpectralSolver"]
 
-    def __init__(
-        self, cfg: SubDictionary, vmesh: BaseVelocityMesh, *args, **kwargs
-    ):
-        super().__init__(cfg, vmesh, *args, **kwargs)
+    def __init__(self, cfg: SubDictionary, *args, **kwargs):
+        super().__init__(cfg, *args, **kwargs)
         self.load_parameters()
+        self.compute_quadratures()
         self.perform_precomputation()
         logger.info("scattering-model: finished computation")
 
@@ -53,6 +51,7 @@ class FastSpectral(BaseScatteringModel):
         self._omega = omega
         logger.info("Kn: {}", 1.0 / invKn)
 
+    def compute_quadratures(self):
         # spherical quadrature for integration on sphere
         self._ssrule = self._cfg.lookup("spherical_rule")
         self._M = self._cfg.lookupint("M")
@@ -120,9 +119,11 @@ class FastSpectral(BaseScatteringModel):
         out: torch.Tensor,
     ):
         for k, e in ndrange(*element_data.shape[:2]):
-            out[k, e, :].add_(self.solve_at_point(element_data[k, e, :]))
+            out[k, e, :].add_(
+                self.solve_at_point(element_data[k, e, :], self._prefactor)
+            )
 
-    def solve_at_point(self, f0: torch.Tensor, nu=None):
+    def solve_at_point(self, f0: torch.Tensor, prefactor, nu=None):
         # convert real valued tensor to complex valued tensor
         shape = self.vmesh.shape
         mnshape = (self._M, self._Nrho, *shape)
@@ -159,15 +160,12 @@ class FastSpectral(BaseScatteringModel):
         fC = ifft3(Ftf)
 
         if nu is not None:
-            nu.copy_(fC.real.sum().mul_(self._prefactor))
+            nu.copy_(fC.real.sum().mul_(prefactor))
 
         # output
-        return (
-            (QG - fC.mul_(f0.reshape(shape))).real.mul_(self._prefactor).ravel()
-        )
+        return (QG - fC.mul_(f0.reshape(shape))).real.mul_(prefactor).ravel()
 
 
-# Simplified VHS model for GLL based nodal collocation schemes
 class PenalizedFastSpectral(FastSpectral):
     kind = "penalized-fast-spectral-vhs"
     allowed_solvers = ["ImexFastSpectralSolver"]
@@ -181,5 +179,45 @@ class PenalizedFastSpectral(FastSpectral):
     ):
         for k, e in ndrange(*element_data.shape[:2]):
             out[k, e, :].add_(
-                self.solve_at_point(element_data[k, e, :], nu=nu[k, e, :])
+                self.solve_at_point(
+                    element_data[k, e, :], self._prefactor, nu=nu[k, e, :]
+                )
+            )
+
+
+class PenalizedFastSpectral(FastSpectral):
+    kind = "penalized-fast-spectral-vhs-mixing-regime"
+    allowed_solvers = ["ImexFastSpectralSolver"]
+
+    def load_parameters(self):
+        alpha = 1.0
+        self._omega = omega = self._cfg.lookupfloat("omega")
+        self._gamma = 2.0 * (1 - omega)
+
+        nodes = self.dgmesh.get_element_nodes["tri"]
+        vars = {"x": nodes[..., 0], "y": nodes[..., 1]}
+        invKn = 1.0 / npeval(self._cfg.lookupexpr("Kn-expr"), vars)
+
+        self._prefactor = to_torch_device(
+            invKn
+            * alpha
+            / (pow(2.0, 2 - omega + alpha) * gamma(2.5 - omega) * np.pi),
+            self._cfg,
+        )
+        Kn = 1 / invKn
+        logger.info("min(Kn) {}, max(Kn) {}", Kn.min(), Kn.max())
+
+    def solve(
+        self,
+        curr_time: torch.float64,
+        element_data: torch.Tensor,
+        out: torch.Tensor,
+        nu: torch.Tensor,
+    ):
+        prefactor = self._prefactor
+        for k, e in ndrange(*element_data.shape[:2]):
+            out[k, e, :].add_(
+                self.solve_at_point(
+                    element_data[k, e, :], prefactor[k, e], nu=nu[k, e, :]
+                )
             )
