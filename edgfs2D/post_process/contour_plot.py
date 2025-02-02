@@ -89,7 +89,7 @@ class ContourPlot:
 
         return (fig, ax)
 
-    def contourf(self, x, y, z, **kwargs):
+    def contourf(self, *args, **kwargs):
         if not hasattr(self, "ax"):
             fig, ax = self.subplots()
         kwargs.update({"cmap": self.cmap})
