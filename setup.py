@@ -81,7 +81,7 @@ install_requires = [
 ]
 
 # Soft dependencies
-extras_require = {"pyvista >= 0.44", "autoflake >= 2.3"}
+extras_require = {"all": ["pyvista >= 0.44", "autoflake >= 2.3"]}
 
 # Scripts
 console_scripts = [
