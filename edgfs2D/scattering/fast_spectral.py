@@ -185,7 +185,7 @@ class PenalizedFastSpectral(FastSpectral):
             )
 
 
-class PenalizedFastSpectral(FastSpectral):
+class PenalizedFastSpectralMixingRegime(FastSpectral):
     kind = "penalized-fast-spectral-vhs-mixing-regime"
     allowed_solvers = ["ImexFastSpectralSolver"]
 

@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 from edgfs2D.scattering.base import BaseScatteringModel
-from edgfs2D.scattering.fast_spectral import FastSpectral  # noqa
+from edgfs2D.scattering.fast_spectral import (  # noqa
+    FastSpectral,
+    PenalizedFastSpectral,
+    PenalizedFastSpectralMixingRegime,
+)
 from edgfs2D.utils.nputil import subclass_where
 
 scattering_sect = "scattering-model"
