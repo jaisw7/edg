@@ -98,7 +98,7 @@ class VtuPostProcessor(BasePostProcessor):
 
         # define uniform nodes on the basis elements
         basis = basis[shape]
-        celldata = CellData(self._subdivs * basis.num_nodes)
+        celldata = CellData(self._subdivs)
         nodes = celldata.nodes()
 
         # interpolate to new nodes
@@ -137,8 +137,10 @@ class VtuPostProcessor(BasePostProcessor):
         writeln(r"<PointData>")
         for field in fields:
             data = reader.read_field_data(field, shape)
-            interp_data = basis.interpolate(data, interp_op)
-            self.write_data_array(writeln, field, interp_data.swapaxes(0, 1), 1)
+            interp_data = basis.interpolate(data, interp_op).swapaxes(0, 1)
+            self.write_data_array(
+                writeln, field, interp_data, interp_data.shape[-1]
+            )
         writeln(r"</PointData>")
 
         # write piece footer
