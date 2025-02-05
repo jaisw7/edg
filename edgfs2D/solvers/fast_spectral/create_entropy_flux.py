@@ -29,11 +29,13 @@ class BoltzmannEntropyFlux(FastSpectralEntropyFlux):
     def log_mean(self, x: torch.Tensor, y: torch.Tensor):
         # Ismail and Roe, J. Comput. Phys. 228 (15) (2009) 5410–5436
         eps = torch.finfo(x.dtype).eps
-        u = (x * (x - 2 * y) + y * y) / (x * (x + 2 * y) + y * y)
-        return torch.where(
-            u < 1e-4,
-            (x + y) * 105 / ((210 + u * (70 + u * (42 + u * 30))) + eps),
-            (x - y) / (torch.log(torch.abs(x / (y + eps)) + eps) + eps),
+        xi = torch.abs(x / (y + eps))
+        f = (xi - 1) / (xi + 1)
+        u = f * f
+        return (x + y) / torch.where(
+            u < 1e-2,
+            ((210 + u * (70 + u * (42 + u * 30)))) / 105,
+            torch.log(xi + eps) / (f + eps),
         )
 
     @override

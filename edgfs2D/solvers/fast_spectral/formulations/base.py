@@ -135,5 +135,5 @@ class BaseFormulation(BaseSolver, MomentMixin):
         for id, name in enumerate(fields):
             field = FieldData()
             for shape in moments.keys():
-                field[shape] = moments[shape][..., id]
+                field[shape] = moments[shape][..., id].unsqueeze(-1)
             writer.write_fields(FieldData({name: field}))

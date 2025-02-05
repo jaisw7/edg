@@ -136,7 +136,7 @@ class VtuPostProcessor(BasePostProcessor):
         # write point data
         writeln(r"<PointData>")
         for field in fields:
-            data = reader.read_field_data(field, shape)
+            data = reader.read_field_data(field, shape)[..., np.newaxis]
             interp_data = basis.interpolate(data, interp_op).swapaxes(0, 1)
             self.write_data_array(
                 writeln, field, interp_data, interp_data.shape[-1]
