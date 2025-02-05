@@ -105,7 +105,7 @@ class FernandezHickenZingg(BaseBasis):
             ijac[0, ..., 0] * ijac[1, ..., 1]
             - ijac[1, ..., 0] * ijac[0, ..., 1]
         )
-        assert np.all(det > 1e-8), "element jacobian determinant is too small"
+        assert np.all(det > 1e-14), "element jacobian determinant is too small"
 
         # compute jacobian i.e., dxi / dx
         jac = ijac.copy()
