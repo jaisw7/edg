@@ -199,7 +199,7 @@ class PenalizedFastSpectralMixingRegime(FastSpectral):
             self._cfg,
         )
         Kn = 1 / invKn
-        logger.info("min(Kn) {}, max(Kn) {}", Kn.min(), Kn.max())
+        logger.info("Kn: ({}, {})", Kn.min(), Kn.max())
 
     def solve(
         self,

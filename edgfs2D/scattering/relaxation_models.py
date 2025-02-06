@@ -6,6 +6,8 @@ from loguru import logger
 from edgfs2D.fields.types import FieldData
 from edgfs2D.scattering.base import BaseScatteringModel
 from edgfs2D.utils.dictionary import SubDictionary
+from edgfs2D.utils.nputil import npeval
+from edgfs2D.utils.util import to_torch_device
 
 
 class BaseRelaxationModel(BaseScatteringModel):
@@ -13,7 +15,7 @@ class BaseRelaxationModel(BaseScatteringModel):
 
 
 # Bhatnagar-Gross-Krook model
-class BgkRelaxationModel(BaseRelaxationModel):
+class BgkRelaxation(BaseRelaxationModel):
     kind = "bgk-relaxation"
     allowed_solvers = ["ImexFastSpectralSolver"]
     num_fields = 5
@@ -75,3 +77,19 @@ class BgkRelaxationModel(BaseRelaxationModel):
 
     def solve(self):
         raise RuntimeError("not implemented")
+
+
+class BgkRelaxationMixingRegime(BgkRelaxationModel):
+    kind = "bgk-relaxation-mixing-regime"
+    allowed_solvers = ["ImexFastSpectralSolver"]
+
+    def load_parameters(self):
+        self._omega = omega = self._cfg.lookupfloat("omega")
+
+        nodes = self.dgmesh.get_element_nodes["tri"]
+        vars = {"x": nodes[..., 0], "y": nodes[..., 1]}
+        invKn = 1.0 / npeval(self._cfg.lookupexpr("Kn-expr"), vars)
+
+        self._prefactor = to_torch_device(100 * invKn, self._cfg)
+        Kn = 1 / invKn
+        logger.info("Kn: ({}, {})", Kn.min(), Kn.max())

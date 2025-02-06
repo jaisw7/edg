@@ -7,7 +7,8 @@ from edgfs2D.scattering.fast_spectral import (  # noqa
 )
 from edgfs2D.scattering.relaxation_models import (  # noqa
     BaseRelaxationModel,
-    BgkRelaxationModel,
+    BgkRelaxation,
+    BgkRelaxationMixingRegime,
 )
 from edgfs2D.utils.nputil import subclass_where
 
