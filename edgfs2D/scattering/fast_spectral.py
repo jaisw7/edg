@@ -49,7 +49,7 @@ class FastSpectral(BaseScatteringModel):
             / (pow(2.0, 2 - omega + alpha) * gamma(2.5 - omega) * np.pi)
         )
         self._omega = omega
-        logger.info("Kn: {}", 1.0 / invKn)
+        logger.info("Kn {}, prefactor {}", 1 / invKn, self._prefactor)
 
     def compute_quadratures(self):
         # spherical quadrature for integration on sphere
@@ -123,7 +123,7 @@ class FastSpectral(BaseScatteringModel):
                 self.solve_at_point(element_data[k, e, :], self._prefactor)
             )
 
-    def solve_at_point(self, f0: torch.Tensor, prefactor, nu=None):
+    def solve_at_point(self, f0: torch.Tensor, prefactor):
         # convert real valued tensor to complex valued tensor
         shape = self.vmesh.shape
         mnshape = (self._M, self._Nrho, *shape)
@@ -159,9 +159,6 @@ class FastSpectral(BaseScatteringModel):
         # inverse fft| fC = iff(FTf)
         fC = ifft3(Ftf)
 
-        if nu is not None:
-            nu.copy_(fC.real.sum().mul_(prefactor))
-
         # output
         return (QG - fC.mul_(f0.reshape(shape))).real.mul_(prefactor).ravel()
 
@@ -175,13 +172,10 @@ class PenalizedFastSpectral(FastSpectral):
         curr_time: torch.float64,
         element_data: torch.Tensor,
         out: torch.Tensor,
-        nu: torch.Tensor,
     ):
         for k, e in ndrange(*element_data.shape[:2]):
             out[k, e, :].add_(
-                self.solve_at_point(
-                    element_data[k, e, :], self._prefactor, nu=nu[k, e, :]
-                )
+                self.solve_at_point(element_data[k, e, :], self._prefactor)
             )
 
 
@@ -212,12 +206,9 @@ class PenalizedFastSpectralMixingRegime(FastSpectral):
         curr_time: torch.float64,
         element_data: torch.Tensor,
         out: torch.Tensor,
-        nu: torch.Tensor,
     ):
         prefactor = self._prefactor
         for k, e in ndrange(*element_data.shape[:2]):
             out[k, e, :].add_(
-                self.solve_at_point(
-                    element_data[k, e, :], prefactor[k, e], nu=nu[k, e, :]
-                )
+                self.solve_at_point(element_data[k, e, :], prefactor[k, e])
             )
