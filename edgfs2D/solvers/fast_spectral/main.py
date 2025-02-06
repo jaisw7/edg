@@ -5,6 +5,8 @@ Entropy Stable discontinous galerkin solver for Boltzmann equation
 """
 
 
+from loguru import logger
+
 from edgfs2D.distribution_mesh.dgdist_mesh import DgDistMesh
 from edgfs2D.physical_mesh.dg_mesh import DgMesh
 from edgfs2D.physical_mesh.nondim_mesh import NondimMesh
@@ -16,6 +18,8 @@ from edgfs2D.velocity_mesh import get_velocity_mesh
 
 
 def main():
+    logger.add("fast_spectral_{time}.log")
+
     # read the inputs
     cfg, args = initialize()
 

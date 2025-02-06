@@ -79,7 +79,7 @@ class BgkRelaxation(BaseRelaxationModel):
         raise RuntimeError("not implemented")
 
 
-class BgkRelaxationMixingRegime(BgkRelaxationModel):
+class BgkRelaxationMixingRegime(BgkRelaxation):
     kind = "bgk-relaxation-mixing-regime"
     allowed_solvers = ["ImexFastSpectralSolver"]
 
