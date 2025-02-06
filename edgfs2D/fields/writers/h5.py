@@ -10,6 +10,7 @@ from edgfs2D.fields.writers.base import BaseFieldWriter
 class H5FieldWriter(BaseFieldWriter):
     mode = "a"
     extn = ".h5"
+    compression = "gzip"
 
     def __init__(self, path: Path):
         self._path = (
@@ -33,4 +34,8 @@ class H5FieldWriter(BaseFieldWriter):
             for key, val in data.items():
                 group = h5f.create_group(key)
                 for shape, soln in val.items():
-                    group.create_dataset(shape, data=soln.cpu().numpy())
+                    group.create_dataset(
+                        shape,
+                        data=soln.cpu().numpy(),
+                        compression=self.compression,
+                    )
