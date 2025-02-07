@@ -221,6 +221,7 @@ class FernandezHickenZingg(BaseBasis):
         return to_torch_device(self._D, self.cfg)
 
     @override
+    @torch.compile
     def grad(
         self, element_data: torch.Tensor, element_jac: torch.Tensor
     ) -> torch.Tensor:
@@ -240,6 +241,7 @@ class FernandezHickenZingg(BaseBasis):
         return element_data[self.face_nodes_mask_all, ...]
 
     @override
+    @torch.compile
     def convect(
         self, grad_element_data: torch.Tensor, velocity: torch.Tensor
     ) -> torch.Tensor:
@@ -253,6 +255,7 @@ class FernandezHickenZingg(BaseBasis):
         return to_torch_device(self._L, self.cfg)
 
     @override
+    @torch.compile
     def lift(self, surface_data: torch.Tensor):
         return torch.tensordot(self.lift_op, surface_data, dims=1)
 
@@ -309,6 +312,7 @@ class FernandezHickenZingg(BaseBasis):
         return np.tensordot(interp_op, element_data, axes=1)
 
     @override
+    @torch.compile
     def convect_eflux(
         self, eflux_data: torch.Tensor, element_jac: torch.Tensor
     ) -> torch.Tensor:
