@@ -147,7 +147,6 @@ class DiffuseCurvedWallBoundaryCondition(FastSpectralBoundaryCondition):
         nu = torch.tensordot(
             nl, self.vpoints[:2, ...] - self._u[:2, ...], dims=1
         )
-        print(nu.shape) + exit(0)
         pos = torch.where(nu >= 0, 1, 0)
         neg = torch.where(nu < 0, 1, 0)
         return (
@@ -170,7 +169,7 @@ class DiffuseCurvedWallBoundaryCondition(FastSpectralBoundaryCondition):
 
         # update flux
         ur = pos_id * ul
-        ur.add_(torch.outer(nden, neg_id * self._f0))
+        ur.add_(nden.unsqueeze(-1) * neg_id * self._f0)
 
         return ur
 
