@@ -89,19 +89,25 @@ class MaxwellianInitialCondition(FastSpectralInitialCondition):
         ele_sol[4] /= ele_sol[0]
 
         if not (
-            np.allclose(self._rhoini * rho0, ele_sol[0] * rho0, atol=1e-5)
-            and np.allclose(self._uini[0, 0] * u0, ele_sol[1] * u0, atol=1e-5)
-            and np.allclose(self._uini[1, 0] * u0, ele_sol[2] * u0, atol=1e-5)
-            and np.allclose(self._uini[2, 0] * u0, ele_sol[3] * u0, atol=1e-5)
-            and np.allclose(self._Tini * T0, ele_sol[4] * T0, atol=1e-5)
+            np.allclose(self._rhoini, ele_sol[0], atol=1e-5)
+            and np.allclose(self._uini[0, 0], ele_sol[1], atol=1e-5)
+            and np.allclose(self._uini[1, 0], ele_sol[2], atol=1e-5)
+            and np.allclose(self._uini[2, 0], ele_sol[3], atol=1e-5)
+            and np.allclose(self._Tini, ele_sol[4], atol=1e-5)
         ):
             logger.info("Bulk properties not conserved!")
             logger.info("Calculated bulk properties based on provided inputs:")
-            logger.info("density {}", self._rhoini * rho0, ele_sol[0] * rho0)
-            logger.info("x-velocity {}", self._uini[0, 0] * u0, ele_sol[1] * u0)
-            logger.info("y-velocity {}", self._uini[1, 0] * u0, ele_sol[2] * u0)
-            logger.info("z-velocity {}", self._uini[2, 0] * u0, ele_sol[3] * u0)
-            logger.info("temperature: {}", self._Tini * T0, ele_sol[4] * T0)
+            logger.info("density {} {}", self._rhoini * rho0, ele_sol[0] * rho0)
+            logger.info(
+                "x-velocity {} {}", self._uini[0, 0] * u0, ele_sol[1] * u0
+            )
+            logger.info(
+                "y-velocity {} {}", self._uini[1, 0] * u0, ele_sol[2] * u0
+            )
+            logger.info(
+                "z-velocity {} {}", self._uini[2, 0] * u0, ele_sol[3] * u0
+            )
+            logger.info("temperature: {} {}", self._Tini * T0, ele_sol[4] * T0)
             raise ValueError("Check velocity mesh parameters")
 
     @override
