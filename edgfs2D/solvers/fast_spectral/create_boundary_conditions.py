@@ -76,6 +76,7 @@ class DiffuseWallBoundaryCondition(FastSpectralBoundaryCondition):
         )
 
     @override
+    @torch.compile
     def apply(
         self,
         curr_time: torch.float64,
@@ -119,6 +120,7 @@ class SpecularWallBoundaryCondition(FastSpectralBoundaryCondition):
         return f0
 
     @override
+    @torch.compile
     def apply(
         self,
         curr_time: torch.float64,
@@ -157,6 +159,7 @@ class DiffuseCurvedWallBoundaryCondition(FastSpectralBoundaryCondition):
         )
 
     @override
+    @torch.compile
     def apply(
         self,
         curr_time: torch.float64,

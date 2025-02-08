@@ -26,6 +26,7 @@ class LaxFriedrichsFlux(FastSpectralFlux):
         return self._velocity
 
     @override
+    @torch.compile
     def apply(self, ul: torch.Tensor, ur: torch.Tensor, nl: torch.Tensor):
         # As per Hasthaven pp. 170, Ch. 6
         dim = nl.shape[1]

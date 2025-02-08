@@ -26,6 +26,7 @@ class LaxFriedrichsFlux(AdvFlux):
         return self._velocity
 
     @override
+    @torch.compile
     def apply(self, ul: torch.Tensor, ur: torch.Tensor, nl: torch.Tensor):
         # As per Hasthaven pp. 170, Ch. 6
         nu = torch.tensordot(nl, self._velocity, dims=1)

@@ -25,6 +25,7 @@ class Moments:
     def vpoints(self, dtype, device):
         return self._vmesh.points
 
+    @torch.compile
     def __call__(self, soln: torch.Tensor):
         vm = self._vmesh
         cv = self.vpoints(soln.dtype, soln.device)

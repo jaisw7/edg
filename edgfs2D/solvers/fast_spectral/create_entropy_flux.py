@@ -26,6 +26,7 @@ class BoltzmannEntropyFlux(FastSpectralEntropyFlux):
     def velocity(self):
         return self._velocity
 
+    @torch.compile
     def log_mean(self, x: torch.Tensor, y: torch.Tensor):
         # Ismail and Roe, J. Comput. Phys. 228 (15) (2009) 5410–5436
         eps = torch.finfo(x.dtype).eps
@@ -39,6 +40,7 @@ class BoltzmannEntropyFlux(FastSpectralEntropyFlux):
         )
 
     @override
+    @torch.compile
     def apply(self, ul: torch.Tensor, ur: torch.Tensor):
         npts = ul.shape[0]
         fs = torch.zeros((2, npts, *ul.shape), dtype=ul.dtype, device=ul.device)

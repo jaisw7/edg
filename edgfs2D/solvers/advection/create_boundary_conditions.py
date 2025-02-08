@@ -13,6 +13,7 @@ class SinCosBoundaryCondition(AdvBoundaryCondition):
     kind = "advection-sincos"
 
     @override
+    @torch.compile
     def apply(
         self,
         curr_time: torch.float64,

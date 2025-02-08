@@ -237,6 +237,7 @@ class FernandezHickenZingg(BaseBasis):
         return gradu
 
     @override
+    @torch.compile
     def surface_data(self, element_data: torch.Tensor) -> torch.Tensor:
         return element_data[self.face_nodes_mask_all, ...]
 
@@ -264,6 +265,7 @@ class FernandezHickenZingg(BaseBasis):
         return to_torch_device(self._H, self.cfg)
 
     @override
+    @torch.compile
     def error(self, error_data: torch.Tensor, element_jac_det: torch.Tensor):
         return (
             torch.sqrt(
@@ -308,6 +310,7 @@ class FernandezHickenZingg(BaseBasis):
         return mul(Vr, Fwd)
 
     @override
+    @torch.compile
     def interpolate(self, element_data: np.ndarray, interp_op: np.ndarray):
         return np.tensordot(interp_op, element_data, axes=1)
 
