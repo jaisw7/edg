@@ -113,7 +113,7 @@ class SpecularWallBoundaryCondition(FastSpectralBoundaryCondition):
             norm, torch.tensordot(norm, self.vpoints, dims=1)
         )
         sorted_idx = torch.arange(0, Nv, device=self._cfg.device)
-        f0 = torch.Tensor(fuzzysort(cr, sorted_idx))
+        f0 = torch.Tensor(fuzzysort(cr, sorted_idx), device=self._cfg.device)
         if not torch.all(torch.sort(f0)[0] == sorted_idx):
             raise ValueError("Non-unique map")
         return f0
