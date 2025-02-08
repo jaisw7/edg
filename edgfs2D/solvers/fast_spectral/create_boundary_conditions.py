@@ -153,7 +153,7 @@ class DiffuseCurvedWallBoundaryCondition(FastSpectralBoundaryCondition):
             pos,
             neg,
             pos * nu * self.vweights,
-            -(neg * nu * self.vweights * self._f0).sum(),
+            -(neg * nu * self.vweights * self._f0).sum(axis=1),
         )
 
     @override
