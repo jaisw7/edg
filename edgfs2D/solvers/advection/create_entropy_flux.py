@@ -26,7 +26,6 @@ class TwoPointEntropyFlux(AdvEntropyFlux):
         return self._velocity
 
     @override
-    @torch.compile
     def apply(self, ul: torch.Tensor, ur: torch.Tensor):
         npts = ul.shape[0]
         fs = torch.zeros((2, npts, *ul.shape), dtype=ul.dtype, device=ul.device)
