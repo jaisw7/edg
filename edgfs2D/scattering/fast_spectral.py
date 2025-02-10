@@ -128,7 +128,9 @@ class FastSpectral(BaseScatteringModel):
         shape = self.vmesh.shape
         mnshape = (self._M, self._Nrho, *shape)
         fft3 = lambda f: torch.fft.fftn(f, norm="ortho", dim=(-3, -2, -1))
-        ifft3 = lambda f: torch.fft.ifftn(f, norm="ortho", dim=(-3, -2, -1))
+        ifft3s = lambda f: torch.fft.ifftn(
+            f, norm="ortho", dim=(-3, -2, -1), out=f
+        )
 
         # compute forward FFT of f | Ftf = fft(f)
         Ftf = fft3(f0.reshape(shape))
@@ -142,7 +144,9 @@ class FastSpectral(BaseScatteringModel):
         )
 
         # compute t2 = ifft(t1)^2 + ifft(t2)^2
-        t2 = ifft3(t1) ** 2 + ifft3(t2) ** 2
+        ifft3s(t1).pow_(2)
+        ifft3s(t2).pow_(2)
+        t2.add_(t1)
 
         # compute t1 = fft(t2)
         t1 = fft3(t2).reshape(self._Nrho, self._M, -1)
@@ -150,17 +154,17 @@ class FastSpectral(BaseScatteringModel):
         # compute fC_r = b1_p*t1_r
         fC = ((self._bb1.unsqueeze(1) * t1).sum(dim=(0, 1))).reshape(shape)
 
-        # inverse fft| QG = iff(fC)  [Gain computed]
-        QG = ifft3(fC)
+        # inverse fft| fC = iff(fC)  [Gain computed]
+        ifft3s(fC)
 
         # compute FTf_r = b2_r*FTf_r
         Ftf.mul_(self._bb2.reshape(shape))
 
-        # inverse fft| fC = iff(FTf)
-        fC = ifft3(Ftf)
+        # inverse fft| FTf = iff(FTf)
+        ifft3s(Ftf)
 
         # output
-        return (QG - fC.mul_(f0.reshape(shape))).real.mul_(prefactor).ravel()
+        return (fC - Ftf.mul_(f0.reshape(shape))).real.mul_(prefactor).ravel()
 
 
 class PenalizedFastSpectral(FastSpectral):

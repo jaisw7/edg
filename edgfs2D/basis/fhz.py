@@ -290,11 +290,9 @@ class FernandezHickenZingg(BaseBasis):
         B = np.zeros((int((p + 1) * (p + 2) / 2), len(r)))
         a, b = self.rstoab(r, s)
 
-        k = 0
-        for i in range(p + 1):
-            for j in range(p - i + 1):
-                B[k, :] = tri_northo_basis(a, b, i, j).ravel()
-                k += 1
+        idx = [(i, j) for i in range(p + 1) for j in range(p - i + 1)]
+        for k, (i, j) in enumerate(idx):
+            B[k, :] = tri_northo_basis(a, b, i, j).ravel()
         return B
 
     @cached_property
