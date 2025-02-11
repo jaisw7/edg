@@ -75,8 +75,9 @@ class Dictionary(object):
         return path
 
     def lookupexpr(self, section, option, subs={}):
-        expr = self.lookup(section, option)
+        return self.parse_expr(self.lookup(section, option), subs)
 
+    def parse_expr(self, expr, subs={}):
         # Ensure the expression does not contain invalid characters
         if not re.match(r"[A-Za-z0-9 \t\n\r.,+\-*/%()<>=\{\}\[\]\$]+$", expr):
             raise ValueError("Invalid characters in expression")
@@ -121,6 +122,10 @@ class Dictionary(object):
 
     def lookupint_list(self, section, option):
         return self.lookup_list(section, option, int)
+
+    def lookupexpr_list(self, section, option, **kwargs):
+        lst = self.lookup_list(section, option, str)
+        return [self.parse_expr(expr, **kwargs) for expr in lst]
 
     def __str__(self):
         buf = io.StringIO()
@@ -204,6 +209,12 @@ class SubDictionary:
 
     def lookupint_list(self, *args):
         return self.dict.lookup_list(self._section, *args)
+
+    def lookupexpr_list(self, *args, **kwargs):
+        return self.dict.lookupexpr_list(self._section, *args, **kwargs)
+
+    def section_values(self, *args):
+        return self.dict.section_values(self._section, *args)
 
     @property
     def dtype(self):
