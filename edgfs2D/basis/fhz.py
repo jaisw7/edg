@@ -227,10 +227,10 @@ class FernandezHickenZingg(BaseBasis):
     ) -> torch.Tensor:
         gradu = torch.tensordot(self.grad_op, element_data, dims=1)
         ur, us = gradu[0], gradu[1]
-        rx = element_jac[0, ..., 0].unsqueeze(-1)
-        ry = element_jac[0, ..., 1].unsqueeze(-1)
-        sx = element_jac[1, ..., 0].unsqueeze(-1)
-        sy = element_jac[1, ..., 1].unsqueeze(-1)
+        rx = element_jac[0, 0, ..., 0].unsqueeze(-1).unsqueeze(0)
+        ry = element_jac[0, 0, ..., 1].unsqueeze(-1).unsqueeze(0)
+        sx = element_jac[1, 0, ..., 0].unsqueeze(-1).unsqueeze(0)
+        sy = element_jac[1, 0, ..., 1].unsqueeze(-1).unsqueeze(0)
         gu0 = rx * ur + sx * us
         gradu[1] = ry * ur + sy * us
         gradu[0] = gu0
@@ -321,10 +321,10 @@ class FernandezHickenZingg(BaseBasis):
         Dr = self.grad_op[0][..., None, None]
         Ds = self.grad_op[1][..., None, None]
 
-        rx = element_jac[0, ..., 0].unsqueeze(-1)
-        ry = element_jac[0, ..., 1].unsqueeze(-1)
-        sx = element_jac[1, ..., 0].unsqueeze(-1)
-        sy = element_jac[1, ..., 1].unsqueeze(-1)
+        rx = element_jac[0, 0, ..., 0].unsqueeze(-1).unsqueeze(0)
+        ry = element_jac[0, 0, ..., 1].unsqueeze(-1).unsqueeze(0)
+        sx = element_jac[1, 0, ..., 0].unsqueeze(-1).unsqueeze(0)
+        sy = element_jac[1, 0, ..., 1].unsqueeze(-1).unsqueeze(0)
 
         return 2 * (
             rx * (Dr * f1s).sum(axis=1)
