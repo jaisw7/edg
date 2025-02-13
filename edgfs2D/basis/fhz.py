@@ -26,19 +26,19 @@ class FernandezHickenZingg(BaseBasis):
 
         # proto-buf data
         pb_data = get_basis_for_shape(shape=self.shape, name="fhz", deg=degree)
-        sbp = SBP()
-        sbp.ParseFromString(pb_data)
-        assert sbp.degree == degree
+        pb = SBP()
+        pb.ParseFromString(pb_data)
+        assert pb.degree == degree
 
         # define number of nodes
-        self._num_nodes = sbp.numnodes
+        self._num_nodes = pb.numnodes
 
         # define vertex for shapes
-        self._vtx = np.array(sbp.vtx).reshape(-1, self.dim)
+        self._vtx = np.array(pb.vtx).reshape(-1, self.dim)
         assert self._vtx.shape[0] == 3
 
         # define cubature weights
-        cw = np.array(sbp.cw).flatten()
+        cw = np.array(pb.cw).flatten()
         assert cw.shape[0] == self.num_nodes
 
         # define inverse mass matrix
@@ -46,22 +46,14 @@ class FernandezHickenZingg(BaseBasis):
         self._H = np.linalg.inv(self._iH)
 
         # define derivative matrices
-        Q = [np.array(Q.values).reshape(-1, self.num_nodes) for Q in sbp.Q]
+        Q = [np.array(Q.values).reshape(-1, self.num_nodes) for Q in pb.Q]
         self._D = np.stack([self._iH @ q for q in Q])
         assert self._D.shape[1] == self.num_nodes
         assert self._D.shape[2] == self.num_nodes
 
         # define quadrature point
-        self._qz = np.array(sbp.qz).reshape(-1, self.dim)
+        self._qz = np.array(pb.qz).reshape(-1, self.dim)
         assert self._qz.shape[0] == self.num_nodes
-
-        # define vertex for shapes
-        self._qw = np.array(sbp.qw).flatten()
-        assert self._qw.shape[0] == self.num_nodes
-
-        # define face weights
-        self._sqw = np.array(sbp.sqw).flatten()
-        self._sqz = np.array(sbp.sqz).flatten()
 
         # extract surface operators
         self._define_surface_operators()
@@ -80,11 +72,6 @@ class FernandezHickenZingg(BaseBasis):
     @property
     def quad_nodes(self):
         return self._qz
-
-    @override
-    @property
-    def quad_weights(self):
-        return self._qw
 
     @override
     def vertex_to_element_nodes(self, vertex: np.array):

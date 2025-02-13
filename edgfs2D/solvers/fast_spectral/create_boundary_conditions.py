@@ -2,6 +2,7 @@ from functools import cached_property
 
 import numpy as np
 import torch
+from loguru import logger
 from typing_extensions import override
 
 from edgfs2D.boundary_conditions import get_bc_by_cls_and_name
@@ -151,12 +152,23 @@ class DiffuseCurvedWallExprBoundaryCondition(DiffuseWallBoundaryCondition):
         val = val.reshape(shape)
         return val
 
+    def arc_length(self, nodes):
+        idx = np.arange(0, nodes.shape[0])
+        srtidx = fuzzysort(nodes.swapaxes(0, 1), idx)
+        nodes = np.vstack(([0, 0], nodes[srtidx, :]))
+        deltas = np.diff(nodes, axis=0)
+        lengths = np.linalg.norm(deltas, axis=1).cumsum()
+        lengths[srtidx] = lengths[idx]
+        logger.info("arc-lengths: ({}, {})", min(lengths), max(lengths))
+        return lengths
+
     def __init__(self, *args, **kwargs):
         FastSpectralBoundaryCondition.__init__(self, *args, **kwargs)
 
-        nodes = self.nodes.numpy()
+        nodes = self.nodes.cpu().numpy()
         shape = (nodes.shape[0], 1)
         vars = {"x": nodes[..., 0], "y": nodes[..., 1]}
+        vars.update({"s": self.arc_length(nodes)})
         vars.update(self._cfg.section_values(self._cfg.dtype))
         ndim = self.vmesh.nondim
 
@@ -191,6 +203,35 @@ class DiffuseCurvedWallExprBoundaryCondition(DiffuseWallBoundaryCondition):
             pos * nu * self.vweights,
             -(neg * nu * self.vweights * self._f0).sum(axis=1),
         )
+
+
+class DiffuseInletBoundaryCondition(FastSpectralBoundaryCondition):
+    kind = "fast-spectral-inlet"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        ic = MaxwellianInitialCondition(self._cfg, self._vmesh, read_rho=True)
+        self._f0 = ic.init_vals
+        self._u = ic.u
+        _ = self.trace_ids
+
+    @cached_property
+    def trace_ids(self):
+        nl = self.normals
+        return torch.tensordot(
+            nl, self.vpoints[:2, ...] - self._u[:2, ...], dims=1
+        )
+
+    @override
+    @torch.compile
+    def apply(
+        self,
+        curr_time: torch.float64,
+        ul: torch.Tensor,
+    ):
+        nu = self.trace_ids
+        return torch.where(nu >= 0, ul, self._f0.unsqueeze(0))
 
 
 def get_boundary_condition(cfg, name, *args, **kwargs):

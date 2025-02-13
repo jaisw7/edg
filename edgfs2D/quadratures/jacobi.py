@@ -126,6 +126,13 @@ def njacobi1(n, a, b, z):
     return j1
 
 
+def njacobi1_diff(n, a, b, z):
+    if n == 0:
+        return np.zeros_like(z)
+    else:
+        return np.sqrt(n * (n + a + b + 1)) * njacobi1(n - 1, a + 1, b + 1, z)
+
+
 def tri_northo_basis(a, b, i, j):
     return (
         np.sqrt(2.0)
@@ -133,6 +140,32 @@ def tri_northo_basis(a, b, i, j):
         * njacobi1(j, 2 * i + 1, 0.0, b)
         * ((1 - b) ** i)
     )
+
+
+def tri_jac_northo_basis(a, b, i, j, VSMALL=1e-20):
+    Pa, Pb = njacobi1(i, 0.0, 0.0, a), njacobi1(j, 2 * i + 1, 0.0, b)
+    dPa, dPb = njacobi1_diff(i, 0.0, 0.0, a), njacobi1_diff(
+        j, 2 * i + 1, 0.0, b
+    )
+
+    # da/dr dphi/da = (2./(1-b)) * (sqrt(2)*(1-b)^i) * dPa * Pb
+    dBa = np.sqrt(2.0) * dPa * Pb * ((1 - b) ** i) * (2.0 / (1 - b + VSMALL))
+    if i == 1:
+        dBa = np.sqrt(2.0) * dPa * Pb * 2.0
+
+    # da/ds dphi/da + dphi/db = (1+a)/(1-b) * dphi/da + dphi/db
+    dBb = (
+        np.sqrt(2.0) * dPa * Pb * ((1 - b) ** i) * (1 + a) / ((1 - b + VSMALL))
+    )
+    if i == 1:
+        dBb = np.sqrt(2.0) * dPa * Pb * (1 + a)
+
+    # dphi/db = (sqrt(2)*(1-b)^i)*Pa*dPb - i*(sqrt(2)*(1-b)^{i-1})*Pa*Pb
+    dBb += np.sqrt(2.0) * Pa * dPb * ((1 - b) ** i)
+    if i > 0:
+        dBb += -np.sqrt(2.0) * Pa * Pb * ((1 - b) ** (i - 1)) * i
+
+    return dBa, dBb
 
 
 """Computation of gauss quadratures via eigenvalue decomposition.

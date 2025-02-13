@@ -27,10 +27,6 @@ class BaseBasis(object, metaclass=ABCMeta):
     def quad_nodes(self):
         """Quadrature nodes associated with the basis/shape"""
 
-    @abstractproperty
-    def quad_weights(self):
-        """Quadrature weights associated with the basis/shape"""
-
     @abstractmethod
     def vertex_to_element_nodes(self, vertex: np.array):
         """Given vertices of element, compute nodes"""

@@ -29,6 +29,9 @@ def ndgrid(*v):
 
 
 def fuzzysort(arr, idx, dim=0, tol=1e-6):
+    if dim >= len(arr):
+        return idx
+
     # Extract our dimension and argsort
     arrd = arr[dim]
     srtdidx = sorted(idx, key=arrd.__getitem__)

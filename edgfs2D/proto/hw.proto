@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+message HW {
+    // degree of approximation
+    int32 degree = 1;
+
+    // number of nodes
+    int32 numnodes = 2;
+
+    // vertices of reference element
+    repeated double vtx = 3;
+
+    // quadrature nodes
+    repeated double qz = 4;
+}
