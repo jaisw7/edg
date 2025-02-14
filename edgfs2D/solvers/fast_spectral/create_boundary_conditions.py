@@ -211,7 +211,7 @@ class DiffuseInletBoundaryCondition(FastSpectralBoundaryCondition):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        ic = MaxwellianInitialCondition(self._cfg, self._vmesh, read_rho=True)
+        ic = MaxwellianInitialCondition(self._cfg, self._vmesh)
         self._f0 = ic.init_vals
         self._u = ic.u
         _ = self.trace_ids

@@ -34,7 +34,7 @@ class MaxwellianInitialCondition(FastSpectralInitialCondition):
         ndim = self.vmesh.nondim
 
         self._rhoini = 1.0
-        if not ("read_rho" in kwargs):
+        if not ("read_rho" in kwargs) or kwargs["read_rho"] == True:
             self._rhoini = self._cfg.lookupfloat("rho") / ndim.rho0
 
         self._Tini = self._cfg.lookupfloat("T") / ndim.T0
