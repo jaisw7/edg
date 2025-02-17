@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import numpy as np
 import torch as t
 from typing_extensions import Union
@@ -65,3 +66,99 @@ def split_vargs(args):
             else:
                 parent[child] = value
     return vars
+
+
+class IterableProxy(list):
+    def __getattr__(self, attr):
+        return IterableProxy(getattr(x, attr) for x in self)
+
+    def __setattr__(self, attr, val):
+        for x in self:
+            setattr(x, attr, val)
+
+    def __call__(self, *args, **kwargs):
+        return IterableProxy(x(*args, **kwargs) for x in self)
+
+    def __getitem__(self, index):
+        return IterableProxy([x[index] for x in self])
+
+    def apply(self, func):
+        return IterableProxy(func(x) for x in self)
+
+    # access individual entries of the list
+    def get(self, index):
+        return super().__getitem__(index)
+
+    def set(self, index, value):
+        super().__setitem__(index, value)
+
+    # operations on underlying element
+    def __applyattr__(self, attr, other):
+        return IterableProxy(getattr(x, attr)(other) for x in self)
+
+    # Arithmetic operations
+    def __add__(self, other):
+        return self.__applyattr__("__add__", other)
+
+    def __sub__(self, other):
+        return self.__applyattr__("__sub__", other)
+
+    def __mul__(self, other):
+        return self.__applyattr__("__mul__", other)
+
+    def __truediv__(self, other):
+        return self.__applyattr__("__truediv__", other)
+
+    def __floordiv__(self, other):
+        return self.__applyattr__("__floordiv__", other)
+
+    def __mod__(self, other):
+        return self.__applyattr__("__mod__", other)
+
+    def __pow__(self, other):
+        return self.__applyattr__("__pow__", other)
+
+    # Unary operations
+    def __neg__(self):
+        return self.__applyattr__("__neg__", None)
+
+    def __pos__(self):
+        return self.__applyattr__("__pos__", None)
+
+    def __abs__(self):
+        return self.__applyattr__("__abs__", None)
+
+    # Bitwise operations
+    def __and__(self, other):
+        return self.__applyattr__("__and__", other)
+
+    def __or__(self, other):
+        return self.__applyattr__("__or__", other)
+
+    def __xor__(self, other):
+        return self.__applyattr__("__xor__", other)
+
+    def __lshift__(self, other):
+        return self.__applyattr__("__lshift__", other)
+
+    def __rshift__(self, other):
+        return self.__applyattr__("__rshift__", other)
+
+    # Comparisons
+    def __eq__(self, other):
+        return self.__applyattr__("__eq__", other)
+
+    def __ne__(self, other):
+        return self.__applyattr__("__ne__", other)
+
+    def __lt__(self, other):
+        return self.__applyattr__("__lt__", other)
+
+    def __le__(self, other):
+        return self.__applyattr__("__le__", other)
+
+    def __gt__(self, other):
+        return self.__applyattr__("__gt__", other)
+
+    def __ge__(self, other):
+        return self.__applyattr__("__ge__", other)
