@@ -54,8 +54,7 @@ class BaseFormulation(BaseSolver, MomentMixin):
             eflux = fs.compute_entropy_flux(u, u)
             conv = fs.convect_eflux(eflux)
         else:
-            gradu = fs.grad(u)
-            conv = fs.convect(gradu)
+            conv = fs.convect_contravariant(u)
 
         return conv
 

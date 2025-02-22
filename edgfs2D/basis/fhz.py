@@ -319,3 +319,29 @@ class FernandezHickenZingg(BaseBasis):
             + ry * (Dr * f2s).sum(axis=1)
             + sy * (Ds * f2s).sum(axis=1)
         )
+
+    @override
+    @torch.compile
+    def convect_contravariant(
+        self,
+        element_data: torch.Tensor,
+        velocity: torch.Tensor,
+        element_ijac: torch.Tensor,
+        element_jac_det: torch.Tensor,
+    ) -> torch.Tensor:
+        shape = element_data.shape
+        f1, f2 = element_data * velocity[0], element_data * velocity[1]
+        Dr, Ds = self.grad_op[0], self.grad_op[1]
+
+        xr = element_ijac[0, ..., 0].unsqueeze(-1)
+        xs = element_ijac[1, ..., 0].unsqueeze(-1)
+        yr = element_ijac[0, ..., 1].unsqueeze(-1)
+        ys = element_ijac[1, ..., 1].unsqueeze(-1)
+
+        t1 = ys * f1 - xs * f2
+        t2 = -yr * f1 + xr * f2
+
+        res = (Dr @ t1.squeeze(-1)).add_(Ds @ t2.squeeze(-1)).reshape(shape)
+        res.div_(element_jac_det[..., None])
+
+        return res

@@ -59,6 +59,10 @@ class DgField(object, metaclass=ABCMeta):
         return self._to_device(self.dgmesh.get_element_jacobian_mat)
 
     @cached_property
+    def _element_ijac_mat(self):
+        return self._to_device(self.dgmesh.get_element_inverse_jacobian_mat)
+
+    @cached_property
     def _element_jac_det(self):
         return self._to_device(self.dgmesh.get_element_jacobian_det)
 
@@ -189,6 +193,18 @@ class DgField(object, metaclass=ABCMeta):
         data = FieldData()
         for shape, basis in self.dgmesh.get_basis_at_shapes.items():
             data[shape] = basis.convect(gradu[shape], velocity)
+        return data
+
+    def _convect_contravariant(
+        self, u: FieldData, velocity: torch.Tensor
+    ) -> FieldData:
+        data = FieldData()
+        element_ijac = self._element_ijac_mat
+        element_jac_det = self._element_jac_det
+        for shape, basis in self.dgmesh.get_basis_at_shapes.items():
+            data[shape] = basis.convect_contravariant(
+                u[shape], velocity, element_ijac[shape], element_jac_det[shape]
+            )
         return data
 
     def _add_flux(self, uf, velocity, interface, nl, fl, sdetl):

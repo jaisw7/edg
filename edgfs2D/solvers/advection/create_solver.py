@@ -47,8 +47,7 @@ class AdvSolver(BaseSolver):
             eflux = advf.compute_entropy_flux(u, u)
             conv = advf.convect_eflux(eflux)
         else:
-            gradu = advf.grad(u)
-            conv = advf.convect(gradu)
+            conv = advf.convect_contravariant(u)
 
         return conv
 

@@ -106,6 +106,17 @@ class BaseBasis(object, metaclass=ABCMeta):
         """Given entropy-flux data and element jacobian, compute convective
         flux"""
 
+    @abstractmethod
+    def convect_contravariant(
+        self,
+        element_data: torch.Tensor,
+        velocity: torch.Tensor,
+        element_ijac: torch.Tensor,
+        element_jac_det: torch.Tensor,
+    ) -> torch.Tensor:
+        """Given element_data, velocity, and metric terms, compute convection.
+        Note: The approach utilizes Kopriva's metric identities"""
+
 
 class StoredBasis(object):
     @classmethod

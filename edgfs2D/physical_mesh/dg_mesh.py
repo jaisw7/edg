@@ -72,6 +72,10 @@ class DgMesh:
         return self._element_jac_det
 
     @property
+    def get_element_inverse_jacobian_mat(self):
+        return self._element_ijac_mat
+
+    @property
     def get_internal_interfaces(self) -> FieldDataTuple:
         return (self._node_ids_lhs, self._node_ids_rhs)
 
@@ -114,11 +118,13 @@ class DgMesh:
     def _define_geometrical_metrics(self):
         self._element_jac_mat, self._element_jac_det = {}, {}
         self._surface_scaled_jac_det, self._surface_normal = {}, {}
+        self._element_ijac_mat = {}
         for shape, nodes in self._element_nodes.items():
             ijac, jac, det = self._basis[shape].element_geometrical_metrics(
                 nodes
             )
             self._element_jac_mat[shape] = jac
+            self._element_ijac_mat[shape] = ijac
             self._element_jac_det[shape] = det
 
             sdet, snormal = self._basis[shape].surface_geometrical_metrics(ijac)

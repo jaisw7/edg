@@ -76,6 +76,9 @@ class FsField(DgField):
     def convect(self, gradu: FieldData) -> FieldData:
         return super()._convect(gradu, self._velocity)
 
+    def convect_contravariant(self, u: FieldData) -> FieldData:
+        return super()._convect_contravariant(u, self._velocity)
+
     def lift_jump(
         self,
         fl: FieldData,
