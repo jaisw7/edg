@@ -47,6 +47,7 @@ class ContourPlot:
         rcParams["lines.linewidth"] = 0.75
         rcParams["legend.fontsize"] = self.small
         rcParams["axes.prop_cycle"] = self.cycler
+        rcParams["legend.frameon"] = False
 
     @property
     def cmap(self):
@@ -57,8 +58,9 @@ class ContourPlot:
         # fmt: off
         return cycler(
             "color",
-            ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
-            "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
+            ["firebrick", "blue", "black", "#1f77b4", "#ff7f0e",
+             "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f",
+             "#bcbd22", "#17becf"]
         )
         # fmt: on
 
@@ -203,11 +205,11 @@ class ContourPlot:
 
     def add_text(self, x, y, text, fw="bold", zo=2):
         self._ensure_plot()
-        self.ax.text(
+        return self.ax.text(
             x,
             y,
             text,
-            fontsize=self.medium,
+            fontsize=self.small,
             ha="center",
             va="center",
             fontweight=fw,
@@ -224,10 +226,17 @@ class ContourPlot:
 
     def clear_lines(self):
         self._ensure_plot()
-        self.ax.legend_.remove()
+        if self.ax.legend_:
+            self.ax.legend_.remove()
         for line in self.ax.lines:
             line.remove()
         self.ax.set_prop_cycle(self.cycler)
 
     def show(self):
         plt.show()
+
+    def legend(self, **kwargs):
+        self._ensure_plot()
+        kwargs.setdefault("frameon", False)
+        kwargs.setdefault("prop", {"weight": "bold"})
+        self.ax.legend(**kwargs)
