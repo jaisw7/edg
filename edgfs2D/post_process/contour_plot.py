@@ -48,6 +48,9 @@ class ContourPlot:
         rcParams["legend.fontsize"] = self.small
         rcParams["axes.prop_cycle"] = self.cycler
         rcParams["legend.frameon"] = False
+        rcParams["lines.markerfacecolor"] = "none"
+        rcParams["lines.markersize"] = 3
+        rcParams["lines.markeredgewidth"] = 0.5
 
     @property
     def cmap(self):
@@ -55,6 +58,17 @@ class ContourPlot:
 
     @property
     def cycler(self):
+        # fmt: off
+        return cycler(
+            "color",
+            ["firebrick", "blue", "black", "#1f77b4", "#ff7f0e",
+             "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f",
+             "#bcbd22", "#17becf"]
+        )
+        # fmt: on
+
+    @property
+    def markers(self):
         # fmt: off
         return cycler(
             "color",
