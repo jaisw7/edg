@@ -329,7 +329,7 @@ class FernandezHickenZingg(BaseBasis):
         element_ijac: torch.Tensor,
         element_jac_det: torch.Tensor,
     ) -> torch.Tensor:
-        shape = element_data.shape
+        element_data.shape
         f1, f2 = element_data * velocity[0], element_data * velocity[1]
         Dr, Ds = self.grad_op[0], self.grad_op[1]
 
@@ -341,7 +341,9 @@ class FernandezHickenZingg(BaseBasis):
         t1 = ys * f1 - xs * f2
         t2 = -yr * f1 + xr * f2
 
-        res = (Dr @ t1.squeeze(-1)).add_(Ds @ t2.squeeze(-1)).reshape(shape)
+        res = (torch.tensordot(Dr, t1, dims=1)).add_(
+            torch.tensordot(Ds, t2, dims=1)
+        )
         res.div_(element_jac_det[..., None])
 
         return res
