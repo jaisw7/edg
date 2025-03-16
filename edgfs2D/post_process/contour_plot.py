@@ -61,7 +61,7 @@ class ContourPlot:
         # fmt: off
         return cycler(
             "color",
-            ["firebrick", "blue", "black", "#1f77b4", "#ff7f0e",
+            ["firebrick", "blue", "black", "darkorange", "#1f77b4", "#ff7f0e",
              "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f",
              "#bcbd22", "#17becf"]
         )
@@ -71,10 +71,8 @@ class ContourPlot:
     def markers(self):
         # fmt: off
         return cycler(
-            "color",
-            ["firebrick", "blue", "black", "#1f77b4", "#ff7f0e",
-             "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f",
-             "#bcbd22", "#17becf"]
+            "marker",
+            ["o", "s", "D", "^"]
         )
         # fmt: on
 
@@ -237,6 +235,10 @@ class ContourPlot:
     def scatter(self, *args, **kwargs):
         self._ensure_plot()
         return self.ax.scatter(*args, **kwargs)
+
+    def __getattr__(self, attr):
+        self._ensure_plot()
+        return getattr(self.ax, attr)
 
     def clear_lines(self):
         self._ensure_plot()
